@@ -1,0 +1,76 @@
+<section class="row" data-ng-controller="AuthenticationController">
+	<div class="col-xs-offset-2 col-xs-8 col-md-offset-5 col-md-2">
+		<form name="userForm" data-ng-submit="signup()" class="signin form-horizontal" novalidate autocomplete="off">
+			<fieldset>
+				<div class="form-group">
+				</div>
+				<div class="form-group">
+					<label for="firstName">First Name</label>
+					<input type="text" required id="firstName" name="firstName" class="form-control" data-ng-model="credentials.firstName" placeholder="First Name">
+				</div>
+				<div class="form-group">
+					<label for="lastName">Last Name</label>
+					<input type="text" id="lastName" name="lastName" class="form-control" data-ng-model="credentials.lastName" placeholder="Last Name">
+				</div>
+				<div class="form-group">
+					<label>Gender</label>
+					<div class="radio">
+						<label>
+							<input type="radio" name="gender" value="male" ng-change="checkGender()" ng-model="credentials.gender">
+							Male
+						</label>
+					</div>
+					<div class="radio">
+						<label>
+							<input type="radio" name="gender" value="female" ng-change="checkGender()" ng-model="credentials.gender">
+							Female
+						</label>
+					</div>
+				</div>
+				<div class="form-group">
+					<label>Salutation</label>
+					<br>
+					<select class="form-control" ng-model="credentials.salutation" ng-options="option.title for option in salutations" ng-disabled="hasGender"></select>
+				</div>
+				<div class="form-group">
+					<label>Birthday</label>
+					<br>
+					<input type="date" class="form-control" ng-model="credentials.birthday">
+				</div>
+				<div class="form-group">
+					<label for="username">Username</label>
+					<input type="text" id="username" name="username" class="form-control" data-ng-model="credentials.username" placeholder="Username">
+				</div>
+				<div class="form-group">
+					<label for="password">Password</label>
+					<input type="password" id="password" name="password" class="form-control" data-ng-model="credentials.password" placeholder="Password">
+				</div>
+				<div class="form-group">
+					<label for="description">Description</label>
+					<textarea style="resize: none" class="form-control" ng-model="credentials.description" placeholder="Tell us about yourself"></textarea>
+				</div>
+				<div class="form-group" ng-show="isAdmin">
+					<label>Access Level</label>
+					<div class="radio">
+						<label>
+							<input type="radio" name="roles" value="user" ng-change="checkRole()" ng-model="credentials.roles">
+							User
+						</label>
+					</div>
+					<div class="radio">
+						<label>
+							<input type="radio" name="roles" value="admin" ng-change="checkRole()" ng-model="credentials.roles">
+							Admin
+						</label>
+					</div>
+				</div>
+				<div data-ng-show="error" class="form-group text-center text-danger">
+					<strong data-ng-bind="error"></strong>
+				</div>
+				<div class="text-center form-group">
+					<button type="submit" class="btn btn-large btn-block btn-primary">Sign up</button>
+				</div>
+			</fieldset>
+		</form>
+	</div>
+</section>

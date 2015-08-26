@@ -1,0 +1,11 @@
+<section data-ng-controller="HomeController">
+	<div ng-show="isUser">
+		<h2>Hello, {{authentication.user.salutation}} {{authentication.user.firstName}} {{authentication.user.lastName}}</h2>
+		<h4>Your birthday is on {{authentication.user.birthday | date:'shortDate'}}</h4>
+		<h4>Username: {{authentication.user.username}}</h4>
+		<h4>Description: {{authentication.user.description}}</h4>
+	</div>
+	<div ng-show="isAdmin">
+		<a href="/#!/signup">Secret Register Link</a>
+	</div>
+</section>
