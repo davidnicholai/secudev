@@ -18,9 +18,10 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$http
 
 		$scope.signup = function() {
 			$scope.credentials.salutation = $scope.credentials.salutation.title;
+			
 			$http.post('/auth/signup', $scope.credentials).success(function(response) {
 				// If successful we assign the response to the global user model
-				// $scope.authentication.user = response;
+				$scope.authentication.user = response;
 
 				// And redirect to the index page
 				$location.path('/');
@@ -32,7 +33,7 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$http
 		$scope.signin = function() {
 			$http.post('/auth/signin', $scope.credentials).success(function(response) {
 				// If successful we assign the response to the global user model
-				$scope.authentication.user = response;
+				// $scope.authentication.user = response;
 
 				// And redirect to the index page
 				$location.path('/');

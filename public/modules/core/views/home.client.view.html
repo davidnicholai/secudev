@@ -1,8 +1,19 @@
 <section data-ng-controller="HomeController">
+	<br>
+	<div class="row" ng-show="!isUser">
+		<div class="col-xs-offset-2 col-xs-8 col-md-offset-5 col-md-2">
+			<div class="form-group"><a href="/#!/signup" class="btn btn-block btn-primary">Sign up</a></div>
+			<div class="form-group"><a href="/#!/signin" class="btn btn-block btn-success">Sign in</a></div>
+		</div>
+	</div>
 	<div ng-show="isUser">
-		<h2>Hello, {{authentication.user.salutation}} {{authentication.user.firstName}} {{authentication.user.lastName}}</h2>
-		<h4>Your birthday is on {{authentication.user.birthday | date:'shortDate'}}</h4>
-		<h4>Username: {{authentication.user.username}}</h4>
+		<h2>Hello, {{authentication.user.salutation}} {{authentication.user.firstName}} {{authentication.user.lastName}}
+			<small>Username: {{authentication.user.username}}</small>
+		</h2>
+		
+		<hr>
+		<h4>Your birthday is on {{authentication.user.birthday | date:'MMM d, yyyy'}}</h4>
+		<h4></h4>
 		<h4>Description: {{authentication.user.description}}</h4>
 	</div>
 	<div ng-show="isAdmin">

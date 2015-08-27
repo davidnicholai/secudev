@@ -97,7 +97,7 @@ var UserSchema = new Schema({
 		unique: 'testing error message',
 		required: 'Please fill in a username',
 		trim: true,
-		validate: [validateUsername, 'Your username is either existing or longer than 50 characters.']
+		validate: [validateUsername, 'Your username is either existing or longer than 50 characters. Should also be alphanumeric.']
 	},
 	password: {
 		type: String,
