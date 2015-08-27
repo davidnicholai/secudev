@@ -304,11 +304,7 @@ angular.module('users').config(['$stateProvider',
 	function($stateProvider) {
 		// Users state routing
 		$stateProvider.
-		state('view-profile', {
-			url: '/profile',
-			templateUrl: 'modules/users/views/view-profile.client.view.html'
-		}).
-		state('edit-profile', {
+		state('profile', {
 			url: '/settings/profile',
 			templateUrl: 'modules/users/views/settings/edit-profile.client.view.html'
 		}).
@@ -366,9 +362,10 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$http
 
 		$scope.signup = function() {
 			$scope.credentials.salutation = $scope.credentials.salutation.title;
+			
 			$http.post('/auth/signup', $scope.credentials).success(function(response) {
 				// If successful we assign the response to the global user model
-				// $scope.authentication.user = response;
+				$scope.authentication.user = response;
 
 				// And redirect to the index page
 				$location.path('/');
@@ -380,7 +377,7 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$http
 		$scope.signin = function() {
 			$http.post('/auth/signin', $scope.credentials).success(function(response) {
 				// If successful we assign the response to the global user model
-				$scope.authentication.user = response;
+				// $scope.authentication.user = response;
 
 				// And redirect to the index page
 				$location.path('/');
@@ -460,20 +457,6 @@ angular.module('users').controller('PasswordController', ['$scope', '$stateParam
 				$scope.error = response.message;
 			});
 		};
-	}
-]);
-'use strict';
-
-angular.module('users').controller('ProfileController', ['$scope', '$http', '$location', 'Users', 'Authentication',
-	function($scope, $http, $location, Users, Authentication) {
-		$scope.user = Authentication.user;
-
-		// If user is not signed in then redirect back home
-		if (!$scope.user) {
-			alert('Please log in first!');
-			$location.path('/');
-		}
-
 	}
 ]);
 'use strict';
