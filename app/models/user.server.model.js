@@ -27,7 +27,7 @@ var validateMaxLength = function(property) {
 
 var validateGender = function(gender) {
 	console.log(gender);
-	if (gender === 'male' || gender === 'female') {
+	if (gender[0] === 'male' || gender[0] === 'female') {
 		console.log('test: ' + gender);
 		return true;
 	}
