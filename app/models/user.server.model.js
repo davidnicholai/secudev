@@ -25,6 +25,14 @@ var validateMaxLength = function(property) {
 	return true;
 };
 
+var validateGender = function(gender) {
+	if (gender === 'male' || gender === 'female') {
+		return true;
+	}
+
+	return false;
+}
+
 /**
  * A Validation function for local strategy password
  */
@@ -70,10 +78,9 @@ var UserSchema = new Schema({
 	gender: {
 		type: [{
 			type: String,
-			enum: ['male', 'female', 'NA']
+			enum: ['male', 'female']
 		}],
-		default: ['NA'],
-		validate: [validateLocalStrategyProperty, 'Please input your gender.']
+		validate: [validateGender, 'Please input your gender.']
 	},
 	salutation: {
 		type: String,
