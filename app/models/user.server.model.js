@@ -7,16 +7,12 @@ var mongoose = require('mongoose'),
 	Schema = mongoose.Schema,
 	crypto = require('crypto');
 
-/**
- * A Validation function for local strategy properties
- */
+// Validate if input is not empty.
 var validateLocalStrategyProperty = function(property) {
 	return ((this.provider !== 'local' && !this.updated) || property.length);
 };
 
 var validateMaxLength = function(property) {
-	if (this.provider !== 'local')
-		return false;
 	if (property.length >= 51)
 		return false;
 	if (property.length <= 0)
@@ -26,19 +22,10 @@ var validateMaxLength = function(property) {
 };
 
 var validateGender = function(gender) {
-	console.log(gender);
-	if (gender[0] === 'male' || gender[0] === 'female') {
-		console.log('test: ' + gender);
-		return true;
-	}
-
-	return false;
+	return (gender[0] === 'male' || gender[0] === 'female');
 };
 
-/**
- * A Validation function for local strategy password
- */
-var validateLocalStrategyPassword = function(password) {
+var validatePassword = function(password) {
 	return (this.provider !== 'local' || (password && password.length > 6 && password.length < 51));
 };
 
@@ -58,7 +45,35 @@ var validateUsername = function(username) {
 		return false;
 
 	return true;
+};
 
+var validateRole = function(role) {
+	return (role[0] === 'user' || role[0] === 'admin');
+};
+
+var validateSalutation = function(salutation) {
+	console.log(this.gender);
+	console.log(salutation);
+	if (this.gender[0] === 'male') {
+		switch (salutation) {
+			case 'Mr':
+			case 'Sir':
+			case 'Senior':
+			case 'Count': return true;
+			default: return false;	
+		}
+	} else if (this.gender[0] === 'female') {
+		switch (salutation) {
+			case 'Miss':
+			case 'Ms':
+			case 'Mrs':
+			case 'Madame':
+			case 'Seniora': return true;
+			default: return false;
+		}
+	}
+
+	return false;
 };
 
 /**
@@ -87,20 +102,13 @@ var UserSchema = new Schema({
 	salutation: {
 		type: String,
 		default: '',
-		validate: [validateLocalStrategyProperty, 'Please input your salutation.']
+		validate: [validateSalutation, 'Please specify a correct salutation.']
 	},
 	birthday: {
 		type: Date,
 		trim: true,
 		validate: [validateBirthday, 'Only ages 18 and older are allowed to register.']
 	},
-	// email: {
-	// 	type: String,
-	// 	trim: true,
-	// 	default: '',
-	// 	validate: [validateLocalStrategyProperty, 'Please fill in your email'],
-	// 	match: [/.+\@.+\..+/, 'Please fill a valid email address']
-	// },
 	username: {
 		type: String,
 		unique: 'testing error message',
@@ -111,11 +119,12 @@ var UserSchema = new Schema({
 	password: {
 		type: String,
 		default: '',
-		validate: [validateLocalStrategyPassword, 'Password should be more than 6 characters and not longer than 50 characters.']
+		validate: [validatePassword, 'Password should be more than 6 characters and not longer than 50 characters.']
 	},
 	description: {
 		type: String,
-		default: ''
+		default: '',
+		trim: true
 	},
 	salt: {
 		type: String
@@ -131,7 +140,8 @@ var UserSchema = new Schema({
 			type: String,
 			enum: ['user', 'admin']
 		}],
-		default: ['user']
+		default: ['user'],
+		validate: [validateRole, 'Error occured in Role.']
 	},
 	updated: {
 		type: Date
