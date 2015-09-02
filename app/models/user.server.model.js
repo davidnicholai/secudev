@@ -31,7 +31,7 @@ var validateGender = function(gender) {
 	}
 
 	return false;
-}
+};
 
 /**
  * A Validation function for local strategy password
