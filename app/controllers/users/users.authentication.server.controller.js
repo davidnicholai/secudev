@@ -9,12 +9,34 @@ var _ = require('lodash'),
 	passport = require('passport'),
 	User = mongoose.model('User');
 
+function isAdmin(adminAccount) {
+	User.findById(adminAccount._id).exec(function(err, doc) {
+		if (err) return false;
+		if (!doc) {
+			console.log('Failed to load document. Admin isn\'t logged in but an attempt to create an admin account by an unknown user was made.');
+			return false;
+		} else if (doc.roles[0] === 'admin') {
+			return true;
+		} else {
+			return false;
+		}
+	});
+}
+
 /**
  * Signup
  */
 exports.signup = function(req, res) {
 	// For security measurement we remove the roles from the req.body object
-	// delete req.body.roles;
+	// delete req.body.roles;f
+
+	if (req.body.roles === 'admin') {
+		if (isAdmin(req.body.user) === true) {
+			req.body.roles = 'admin';
+		} else {
+			req.body.roles = 'user';
+		}
+	}
 
 	// Init Variables
 	var user = new User(req.body);
@@ -22,11 +44,11 @@ exports.signup = function(req, res) {
 
 	// Add missing user fields
 	user.provider = 'local';
-	// user.displayName = user.firstName + ' ' + user.lastName;
 
 	// Then save the user 
 	user.save(function(err) {
 		if (err) {
+			console.log(err);
 			return res.status(400).send({
 				message: errorHandler.getErrorMessage(err)
 			});

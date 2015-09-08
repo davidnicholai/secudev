@@ -52,8 +52,6 @@ var validateRole = function(role) {
 };
 
 var validateSalutation = function(salutation) {
-	console.log(this.gender);
-	console.log(salutation);
 	if (this.gender[0] === 'male') {
 		switch (salutation) {
 			case 'Mr':

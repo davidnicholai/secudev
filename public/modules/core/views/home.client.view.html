@@ -15,6 +15,8 @@
 		<h4>Your birthday is on {{authentication.user.birthday | date:'MMM d, yyyy'}}</h4>
 		<h4></h4>
 		<h4>Description: {{authentication.user.description}}</h4>
+		<h4>Gender: {{authentication.user.gender[0]}}</h4>
+		<h4>Role: {{authentication.user.roles[0]}}</h4>
 	</div>
 	<div ng-show="isAdmin">
 		<a href="/#!/signup">Secret Register Link</a>
