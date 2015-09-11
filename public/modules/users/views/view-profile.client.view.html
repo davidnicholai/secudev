@@ -1,0 +1,23 @@
+<section class="row" data-ng-controller="ProfileController">
+	<h1>{{authentication.user.salutation}} {{authentication.user.firstName}} {{authentication.user.lastName}}</h1>
+	<hr>
+	Birthday: {{authentication.user.birthday | date: 'longDate'}}
+	<br>
+	Username: {{authentication.user.username}}
+	<br>
+	Role: {{authentication.user.roles}}
+	<br>
+	Gender: {{authentication.user.gender}}
+	<br>
+	Description: {{authentication.user.description}}
+	<br>
+	Account created on: {{authentication.user.created | date: 'medium'}}
+	<br>
+	User ID: {{authentication.user._id}}
+	<div>
+		<a href="/#!/settings/profile">Edit profile</a>
+	</div>
+	<div ng-show="authentication.user.roles === 'admin'">
+		<a href="/#!/signup">Register another user</a>
+	</div>
+</section>

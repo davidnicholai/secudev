@@ -13,18 +13,16 @@ var _ = require('lodash'),
  * Update user details
  */
 exports.update = function(req, res) {
-	// Init Variables
 	var user = req.user;
 	var message = null;
+	var logout = false;
 
-	// For security measurement we remove the roles from the req.body object
-	delete req.body.roles;
+	if (user.roles === 'admin' && req.body.roles === 'user')
+		logout = true;
 
 	if (user) {
-		// Merge existing user
 		user = _.extend(user, req.body);
-		user.updated = Date.now();
-		user.displayName = user.firstName + ' ' + user.lastName;
+		user.updated = Date.now(); // Update the 'updated' field with the current date
 
 		user.save(function(err) {
 			if (err) {
@@ -32,13 +30,21 @@ exports.update = function(req, res) {
 					message: errorHandler.getErrorMessage(err)
 				});
 			} else {
-				req.login(user, function(err) {
-					if (err) {
-						res.status(400).send(err);
-					} else {
-						res.json(user);
-					}
-				});
+				user.password = undefined;
+				user.salt = undefined;
+
+				if (logout) {
+					req.logout();
+					res.redirect('/#!/signin');
+				} else {				
+					req.login(user, function(err) {
+						if (err) {
+							res.status(400).send(err);
+						} else {
+							res.json(user);
+						}					
+					});
+				}
 			}
 		});
 	} else {

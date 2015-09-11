@@ -9,43 +9,13 @@ var _ = require('lodash'),
 	passport = require('passport'),
 	User = mongoose.model('User');
 
-function isAdmin(adminAccount) {
-	User.findById(adminAccount._id).exec(function(err, doc) {
-		if (err) return false;
-		if (!doc) {
-			console.log('Failed to load document. Admin isn\'t logged in but an attempt to create an admin account by an unknown user was made.');
-			return false;
-		} else if (doc.roles[0] === 'admin') {
-			return true;
-		} else {
-			return false;
-		}
-	});
-}
-
-/**
- * Signup
- */
-exports.signup = function(req, res) {
-	// For security measurement we remove the roles from the req.body object
-	// delete req.body.roles;f
-
-	if (req.body.roles === 'admin') {
-		if (isAdmin(req.body.user) === true) {
-			req.body.roles = 'admin';
-		} else {
-			req.body.roles = 'user';
-		}
-	}
-
-	// Init Variables
-	var user = new User(req.body);
+function continueSignup(user, req, res) {
 	var message = null;
 
 	// Add missing user fields
 	user.provider = 'local';
 
-	// Then save the user 
+	// Then save the user
 	user.save(function(err) {
 		if (err) {
 			console.log(err);
@@ -66,6 +36,33 @@ exports.signup = function(req, res) {
 			});
 		}
 	});
+}
+
+/**
+ * Signup
+ */
+exports.signup = function(req, res) {
+	var user;
+	if (req.body.roles === 'admin') {
+		if (req.user) {
+			User.findById(req.user.id).exec(function(err, user) {
+				if (err) throw err;
+				if (!user) {
+					console.log('Failed to load document. Admin isn\'t logged in but an attempt to create an admin account by an unknown user was made.');
+					delete req.body.roles;
+				} else if (user.roles === 'admin') {
+					req.body.roles = 'admin';
+					user = new User(req.body);
+					continueSignup(user, req, res);
+				} else {
+					delete req.body.roles;
+				}
+			});
+		}
+	} else {
+		user = new User(req.body);
+		continueSignup(user, req, res);
+	}
 };
 
 /**

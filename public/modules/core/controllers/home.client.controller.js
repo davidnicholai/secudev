@@ -1,18 +1,11 @@
 'use strict';
 
 
-angular.module('core').controller('HomeController', ['$scope', 'Authentication',
-	function($scope, Authentication) {
+angular.module('core').controller('HomeController', ['$scope', 'Authentication', '$location',
+	function($scope, Authentication, $location) {
 		// This provides Authentication context.
 		$scope.authentication = Authentication;
 
-		$scope.isAdmin = false;
-		$scope.isUser = false;
-		if ($scope.authentication.user) 
-			if ($scope.authentication.user.roles[0] === 'admin') {
-				$scope.isAdmin = true;
-				$scope.isUser = true;
-			} else
-				$scope.isUser = true;
+		if ($scope.authentication) $location.path('/profile'); // If user is logged in, bring him to his profile
 	}
 ]);

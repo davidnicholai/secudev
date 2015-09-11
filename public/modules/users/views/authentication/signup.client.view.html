@@ -1,4 +1,4 @@
-<section class="row" data-ng-controller="AuthenticationController">
+<section class="row" data-ng-controller="SignupController">
 	<div class="col-xs-offset-2 col-xs-8 col-md-offset-5 col-md-2">
 		<form name="userForm" data-ng-submit="signup()" class="signin form-horizontal" novalidate autocomplete="off">
 			<fieldset>
@@ -30,7 +30,7 @@
 				<div class="form-group">
 					<label>Salutation</label>
 					<br>
-					<select class="form-control" data-ng-model="credentials.salutation" ng-options="option.title for option in salutations" ng-disabled="hasGender"></select>
+					<select class="form-control" data-ng-model="credentials.salutation" ng-options="option for option in salutations" ng-disabled="!hasGender"></select>
 				</div>
 				<div class="form-group">
 					<label>Birthday</label>

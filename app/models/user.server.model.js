@@ -22,7 +22,7 @@ var validateMaxLength = function(property) {
 };
 
 var validateGender = function(gender) {
-	return (gender[0] === 'male' || gender[0] === 'female');
+	return (gender === 'male' || gender === 'female');
 };
 
 var validatePassword = function(password) {
@@ -48,11 +48,11 @@ var validateUsername = function(username) {
 };
 
 var validateRole = function(role) {
-	return (role[0] === 'user' || role[0] === 'admin');
+	return (role === 'user' || role === 'admin');
 };
 
 var validateSalutation = function(salutation) {
-	if (this.gender[0] === 'male') {
+	if (this.gender === 'male') {
 		switch (salutation) {
 			case 'Mr':
 			case 'Sir':
@@ -60,7 +60,7 @@ var validateSalutation = function(salutation) {
 			case 'Count': return true;
 			default: return false;	
 		}
-	} else if (this.gender[0] === 'female') {
+	} else if (this.gender === 'female') {
 		switch (salutation) {
 			case 'Miss':
 			case 'Ms':
@@ -91,10 +91,8 @@ var UserSchema = new Schema({
 		validate: [validateMaxLength, 'Please fill in your last name and it should not be longer than 50 characters.']
 	},
 	gender: {
-		type: [{
-			type: String,
-			enum: ['male', 'female']
-		}],
+		type: String,
+		default: 'male',
 		validate: [validateGender, 'Please input your gender.']
 	},
 	salutation: {
@@ -134,11 +132,9 @@ var UserSchema = new Schema({
 	providerData: {},
 	additionalProvidersData: {},
 	roles: {
-		type: [{
-			type: String,
-			enum: ['user', 'admin']
-		}],
-		default: ['user'],
+		type: String,
+		default: 'user',
+		trim: true,
 		validate: [validateRole, 'Error occured in Role.']
 	},
 	updated: {

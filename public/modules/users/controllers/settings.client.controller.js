@@ -6,6 +6,48 @@ angular.module('users').controller('SettingsController', ['$scope', '$http', '$l
 
 		// If user is not signed in then redirect back home
 		if (!$scope.user) $location.path('/');
+		
+		$scope.isAdmin = false;
+		if (Authentication.user)
+			if (Authentication.user.roles === 'admin')
+				$scope.isAdmin = true;
+
+		$scope.credentials = {
+			firstName: $scope.user.firstName,
+			lastName: $scope.user.lastName,
+			roles: $scope.user.roles,
+			birthday: $scope.user.birthday.split('T')[0],
+			gender: $scope.user.gender,
+			salutation: $scope.user.salutation,
+			description: $scope.user.description
+		};
+
+		$scope.hasGender = false;
+
+		$scope.initializeSalutation = function() {
+			if ($scope.credentials.gender === 'male') {
+				$scope.salutations = ['Mr', 'Sir', 'Senior', 'Count'];
+				$scope.credentials.salutation = $scope.salutations[$scope.salutations.indexOf($scope.credentials.salutation)];
+				$scope.hasGender = true;
+			} else if ($scope.credentials.gender === 'female') {
+				$scope.salutations = ['Miss', 'Ms', 'Mrs', 'Madame', 'Seniora'];
+				$scope.credentials.salutation = $scope.salutations[$scope.salutations.indexOf($scope.credentials.salutation)];
+				$scope.hasGender = true;
+			}
+			
+		};
+
+		$scope.checkGender = function() {
+			if ($scope.credentials.gender === 'male') {
+				$scope.salutations = ['Mr', 'Sir', 'Senior', 'Count'];
+				$scope.credentials.salutation = $scope.salutations[0];
+				$scope.hasGender = true;
+			} else if ($scope.credentials.gender === 'female') {
+				$scope.salutations = ['Miss', 'Ms', 'Mrs', 'Madame', 'Seniora'	];
+				$scope.credentials.salutation = $scope.salutations[0];
+				$scope.hasGender = true;
+			}
+		};
 
 		// Check if there are additional accounts 
 		$scope.hasConnectedAdditionalSocialAccounts = function(provider) {
@@ -42,11 +84,12 @@ angular.module('users').controller('SettingsController', ['$scope', '$http', '$l
 		$scope.updateUserProfile = function(isValid) {
 			if (isValid) {
 				$scope.success = $scope.error = null;
-				var user = new Users($scope.user);
+				var user = new Users($scope.credentials);
 
 				user.$update(function(response) {
 					$scope.success = true;
 					Authentication.user = response;
+					$location.path('/profile');
 				}, function(response) {
 					$scope.error = response.data.message;
 				});
