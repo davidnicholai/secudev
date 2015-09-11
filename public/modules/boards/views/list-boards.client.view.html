@@ -1,0 +1,32 @@
+<section data-ng-controller="BoardsController" data-ng-init="find()">
+	<div class="page-header">
+		<h1>Boards</h1>
+	</div>
+	<div class="list-group">
+		<a data-ng-repeat="board in boards" data-ng-href="#!/boards/{{board._id}}" class="list-group-item">
+			<table>
+				<tr>
+					<td><a data-ng-href="#!/profile/{{board.user.username}}" target="_blank">{{board.user.firstName}}</td>
+					<td data-ng-bind="board.created | date: 'MMM dd, yyyy h:mm a'"></td>
+					<td><a data-ng-href="#!/boards/{{board._id}}/edit">Edit</a></td>
+					<td><a data-ng-href="#!/boards/{{board._id}}/edit">Delete</a></td>
+				</tr>
+				<tr>
+					<td><a data-ng-href="#!/profile/{{board.user.username}}" target="_blank">{{board.user.username}}</td>
+					<td data-ng-bind="board.message"></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td data-ng-bind="board.user.created | date: 'MMM dd, yyyy h:mm a'"></td>
+					<td data-ng-bind="board.updated | date: 'MMM dd, yyyy h:mm a'"></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+			</table>
+		</a>
+	</div>
+	<div class="alert alert-warning text-center" data-ng-hide="!boards.$resolved || boards.length">
+		No Boards yet, why don't you <a href="/#!/boards/create">create one</a>?
+	</div>
+</section>

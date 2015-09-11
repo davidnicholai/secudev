@@ -9,6 +9,20 @@ var _ = require('lodash'),
 	passport = require('passport'),
 	User = mongoose.model('User');
 
+exports.getUser = function(req, res) {
+	User.findOne(
+		// Query
+		{username: req.params.username},
+		// Projection
+		{_id : false},
+		// Callback
+		function(err, user) {
+			if (err) return new Error(err);
+			if (!user) return new Error('Failed to load User');
+			res.json(user);
+		});
+};
+
 /**
  * Update user details
  */

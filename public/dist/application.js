@@ -43,12 +43,131 @@ angular.element(document).ready(function() {
 });
 'use strict';
 
+// Use applicaion configuration module to register a new module
+ApplicationConfiguration.registerModule('boards');
+'use strict';
+
 // Use Applicaion configuration module to register a new module
 ApplicationConfiguration.registerModule('core');
 'use strict';
 
 // Use Applicaion configuration module to register a new module
 ApplicationConfiguration.registerModule('users');
+'use strict';
+
+// Configuring the Articles module
+angular.module('boards').run(['Menus',
+	function(Menus) {
+		// Set top bar menu items
+		// Menus.addMenuItem('topbar', 'Boards', 'boards', 'dropdown', '/boards(/create)?');
+		// Menus.addSubMenuItem('topbar', 'boards', 'List Boards', 'boards');
+		// Menus.addSubMenuItem('topbar', 'boards', 'New Board', 'boards/create');
+	}
+]);
+'use strict';
+
+//Setting up route
+angular.module('boards').config(['$stateProvider',
+	function($stateProvider) {
+		// Boards state routing
+		$stateProvider.
+		state('listBoards', {
+			url: '/boards',
+			templateUrl: 'modules/boards/views/list-boards.client.view.html'
+		}).
+		state('createBoard', {
+			url: '/boards/create',
+			templateUrl: 'modules/boards/views/create-board.client.view.html'
+		}).
+		state('viewBoard', {
+			url: '/boards/:boardId',
+			templateUrl: 'modules/boards/views/view-board.client.view.html'
+		}).
+		state('editBoard', {
+			url: '/boards/:boardId/edit',
+			templateUrl: 'modules/boards/views/edit-board.client.view.html'
+		});
+	}
+]);
+'use strict';
+
+// Boards controller
+angular.module('boards').controller('BoardsController', ['$scope', '$stateParams', '$location', 'Authentication', 'Boards',
+	function($scope, $stateParams, $location, Authentication, Boards) {
+		$scope.authentication = Authentication;
+
+		// Create new Board
+		$scope.create = function() {
+			// Create new Board object
+			var board = new Boards ({
+				message: this.message
+			});
+
+			// Redirect after save
+			board.$save(function(response) {
+				$location.path('boards/' + response._id);
+
+				// Clear form fields
+				$scope.message = '';
+			}, function(errorResponse) {
+				$scope.error = errorResponse.data.message;
+			});
+		};
+
+		// Remove existing Board
+		$scope.remove = function(board) {
+			if ( board ) { 
+				board.$remove();
+
+				for (var i in $scope.boards) {
+					if ($scope.boards [i] === board) {
+						$scope.boards.splice(i, 1);
+					}
+				}
+			} else {
+				$scope.board.$remove(function() {
+					$location.path('boards');
+				});
+			}
+		};
+
+		// Update existing Board
+		$scope.update = function() {
+			var board = $scope.board;
+
+			board.$update(function() {
+				$location.path('boards/' + board._id);
+			}, function(errorResponse) {
+				$scope.error = errorResponse.data;
+			});
+		};
+
+		// Find a list of Boards
+		$scope.find = function() {
+			$scope.boards = Boards.query();
+		};
+
+		// Find existing Board
+		$scope.findOne = function() {
+			$scope.board = Boards.get({ 
+				boardId: $stateParams.boardId
+			});
+		};
+	}
+]);
+'use strict';
+
+//Boards service used to communicate Boards REST endpoints
+angular.module('boards').factory('Boards', ['$resource',
+	function($resource) {
+		return $resource('boards/:boardId', { boardId: '@_id'
+		}, {
+			update: {
+				method: 'PUT'
+			}
+		});
+	}
+]);
 'use strict';
 
 // Setting up route
@@ -86,19 +205,12 @@ angular.module('core').controller('HeaderController', ['$scope', 'Authentication
 'use strict';
 
 
-angular.module('core').controller('HomeController', ['$scope', 'Authentication',
-	function($scope, Authentication) {
+angular.module('core').controller('HomeController', ['$scope', 'Authentication', '$location',
+	function($scope, Authentication, $location) {
 		// This provides Authentication context.
 		$scope.authentication = Authentication;
 
-		$scope.isAdmin = false;
-		$scope.isUser = false;
-		if ($scope.authentication.user) 
-			if ($scope.authentication.user.roles[0] === 'admin') {
-				$scope.isAdmin = true;
-				$scope.isUser = true;
-			} else
-				$scope.isUser = true;
+		if ($scope.authentication) $location.path('/profile'); // If user is logged in, bring him to his profile
 	}
 ]);
 'use strict';
@@ -304,7 +416,15 @@ angular.module('users').config(['$stateProvider',
 	function($stateProvider) {
 		// Users state routing
 		$stateProvider.
-		state('profile', {
+		state('view-profile', {
+			url: '/profile',
+			templateUrl: 'modules/users/views/view-profile.client.view.html'
+		}).
+		state('view-other-profile', {
+			url: '/profile/:username',
+			templateUrl: 'modules/users/views/view-other-profile.client.view.html'
+		}).
+		state('edit-profile', {
 			url: '/settings/profile',
 			templateUrl: 'modules/users/views/settings/edit-profile.client.view.html'
 		}).
@@ -340,79 +460,6 @@ angular.module('users').config(['$stateProvider',
 			url: '/password/reset/:token',
 			templateUrl: 'modules/users/views/password/reset-password.client.view.html'
 		});
-	}
-]);
-'use strict';
-
-angular.module('users').controller('AuthenticationController', ['$scope', '$http', '$location', 'Authentication',
-	function($scope, $http, $location, Authentication) {
-		$scope.authentication = Authentication;
-
-		// If user is signed in then redirect back home
-		// if ($scope.authentication.user) $location.path('/');
-
-		// console.log($scope.authentication.user.roles[0]);
-		$scope.isAdmin = false;
-
-		if ($scope.authentication.user) {
-			if ($scope.authentication.user.roles[0] === 'admin') {
-				$scope.isAdmin = true;
-			}
-		}
-
-		$scope.signup = function() {
-			$scope.credentials.salutation = $scope.credentials.salutation.title;
-			
-			$http.post('/auth/signup', $scope.credentials).success(function(response) {
-				// If successful we assign the response to the global user model
-				$scope.authentication.user = response;
-
-				// And redirect to the index page
-				$location.path('/');
-			}).error(function(response) {
-				$scope.error = response.message;
-			});
-		};
-
-		$scope.signin = function() {
-			$http.post('/auth/signin', $scope.credentials).success(function(response) {
-				// If successful we assign the response to the global user model
-				$scope.authentication.user = response;
-
-				// And redirect to the index page
-				$location.path('/');
-			}).error(function(response) {
-				$scope.error = response.message;
-			});
-		};
-
-		$scope.hasGender = true;
-
-		$scope.checkGender = function() {
-			if ($scope.credentials.gender === 'male') {
-				$scope.salutations = [
-					{title: 'Mr'},
-					{title: 'Sir'},
-					{title: 'Senior'},
-					{title: 'Count'}
-				];
-
-				$scope.credentials.salutation = $scope.salutations[0];
-				$scope.hasGender = false;
-			} else if ($scope.credentials.gender === 'female') {
-				$scope.salutations = [
-					{title: 'Miss'},
-					{title: 'Ms'},
-					{title: 'Mrs'},
-					{title: 'Madame'},
-					{title: 'Seniora'}
-				];
-				$scope.credentials.salutation = $scope.salutations[0];
-				$scope.hasGender = false;
-			}
-		};
-
-
 	}
 ]);
 'use strict';
@@ -461,12 +508,136 @@ angular.module('users').controller('PasswordController', ['$scope', '$stateParam
 ]);
 'use strict';
 
+angular.module('users').controller('ProfileController', ['$scope', '$location', 'Authentication', '$http', '$stateParams', 'Boards', '$window',
+	function($scope, $location, Authentication, $http, $stateParams, Boards, $window) {
+		$scope.authentication = Authentication;
+
+		// If user is not signed in then redirect to signin page
+		if (!$scope.authentication.user) $location.path('/signin');
+
+		if ($scope.authentication.user) {
+			if ($scope.authentication.user.gender === 'male')
+				$scope.gender = 'M';
+			else if ($scope.authentication.user.gender === 'female')
+				$scope.gender = 'F';
+		}
+
+		//
+
+		$scope.loadProfile = function() {
+			$http.get('/users/' + $stateParams.username).success(function(response) {
+				console.log(response);
+				$scope.user = response;
+			});
+		};
+
+		//
+		var count = 0;
+		$scope.createBoard = function() {
+			$scope.message = $scope.message + ' ' + count;
+			count++;
+			// Create new Board object
+			var board = new Boards ({
+				message: this.message
+			});
+
+			// Redirect after save
+			board.$save(function(response) {
+				// $location.path('boards/' + response._id);
+
+				// Clear form fields
+				// $scope.message = '';
+			}, function(errorResponse) {
+				$scope.error = errorResponse.data.message;
+			});
+
+		};
+
+		// Remove existing Board
+		$scope.removeBoard = function(boardId) {
+			$http.delete('/boards/' + boardId).success(function(respones) {
+				$window.location.reload();
+			}).error(function(err) {
+				alert(err);
+			});
+		};
+
+		//
+
+		$scope.currentPage = 1;
+        $scope.maxSize = 5;
+
+        $http.get('/boards/count').success(function(response) {
+            $scope.totalItems = response.count;
+        });
+
+        $scope.setPage = function(pageNo) {
+        	$scope.currentPage = pageNo;
+        };
+
+        $scope.pageChanged = function() {
+        	$scope.loadMessages();
+        };
+
+        $scope.loadMessages = function() {
+        	$http.get('/boards/page/' + $scope.currentPage).success(function(response) {
+        		$scope.boards = response;
+        	});
+        };
+
+        // 
+	}
+]);
+'use strict';
+
 angular.module('users').controller('SettingsController', ['$scope', '$http', '$location', 'Users', 'Authentication',
 	function($scope, $http, $location, Users, Authentication) {
 		$scope.user = Authentication.user;
 
 		// If user is not signed in then redirect back home
 		if (!$scope.user) $location.path('/');
+		
+		$scope.isAdmin = false;
+		if (Authentication.user)
+			if (Authentication.user.roles === 'admin')
+				$scope.isAdmin = true;
+
+		$scope.credentials = {
+			firstName: $scope.user.firstName,
+			lastName: $scope.user.lastName,
+			roles: $scope.user.roles,
+			birthday: $scope.user.birthday.split('T')[0],
+			gender: $scope.user.gender,
+			salutation: $scope.user.salutation,
+			description: $scope.user.description
+		};
+
+		$scope.hasGender = false;
+
+		$scope.initializeSalutation = function() {
+			if ($scope.credentials.gender === 'male') {
+				$scope.salutations = ['Mr', 'Sir', 'Senior', 'Count'];
+				$scope.credentials.salutation = $scope.salutations[$scope.salutations.indexOf($scope.credentials.salutation)];
+				$scope.hasGender = true;
+			} else if ($scope.credentials.gender === 'female') {
+				$scope.salutations = ['Miss', 'Ms', 'Mrs', 'Madame', 'Seniora'];
+				$scope.credentials.salutation = $scope.salutations[$scope.salutations.indexOf($scope.credentials.salutation)];
+				$scope.hasGender = true;
+			}
+			
+		};
+
+		$scope.checkGender = function() {
+			if ($scope.credentials.gender === 'male') {
+				$scope.salutations = ['Mr', 'Sir', 'Senior', 'Count'];
+				$scope.credentials.salutation = $scope.salutations[0];
+				$scope.hasGender = true;
+			} else if ($scope.credentials.gender === 'female') {
+				$scope.salutations = ['Miss', 'Ms', 'Mrs', 'Madame', 'Seniora'	];
+				$scope.credentials.salutation = $scope.salutations[0];
+				$scope.hasGender = true;
+			}
+		};
 
 		// Check if there are additional accounts 
 		$scope.hasConnectedAdditionalSocialAccounts = function(provider) {
@@ -503,11 +674,12 @@ angular.module('users').controller('SettingsController', ['$scope', '$http', '$l
 		$scope.updateUserProfile = function(isValid) {
 			if (isValid) {
 				$scope.success = $scope.error = null;
-				var user = new Users($scope.user);
+				var user = new Users($scope.credentials);
 
 				user.$update(function(response) {
 					$scope.success = true;
 					Authentication.user = response;
+					$location.path('/profile');
 				}, function(response) {
 					$scope.error = response.data.message;
 				});
@@ -528,6 +700,72 @@ angular.module('users').controller('SettingsController', ['$scope', '$http', '$l
 				$scope.error = response.message;
 			});
 		};
+	}
+]);
+'use strict';
+
+angular.module('users').controller('SigninController', ['$scope', '$http', '$location', 'Authentication',
+	function($scope, $http, $location, Authentication) {
+		$scope.authentication = Authentication;
+
+		// If user is signed in then redirect back home
+		if ($scope.authentication.user) $location.path('/');
+
+		$scope.signin = function() {
+			$http.post('/auth/signin', $scope.credentials).success(function(response) {
+				// If successful we assign the response to the global user model
+				$scope.authentication.user = response;
+
+				// And redirect to the index page
+				$location.path('/');
+			}).error(function(response) {
+				$scope.error = response.message;
+			});
+		};
+
+	}
+]);
+'use strict';
+
+angular.module('users').controller('SignupController', ['$scope', '$http', '$location', 'Authentication',
+	function($scope, $http, $location, Authentication) {
+		$scope.authentication = Authentication;
+
+		$scope.isAdmin = false;
+
+		if ($scope.authentication.user) {
+			if ($scope.authentication.user.roles === 'admin') {
+				$scope.isAdmin = true;
+			}
+		}
+
+		$scope.signup = function() {			
+			$http.post('/auth/signup', $scope.credentials).success(function(response) {
+				// If successful we assign the response to the global user model
+				$scope.authentication.user = response;
+
+				// And redirect to the index page
+				$location.path('/');
+			}).error(function(response) {
+				$scope.error = response.message;
+			});
+		};
+
+		$scope.hasGender = false;
+
+		$scope.checkGender = function() {
+			if ($scope.credentials.gender === 'male') {
+				$scope.salutations = ['Mr', 'Sir', 'Senior', 'Count'];
+				$scope.credentials.salutation = $scope.salutations[0];
+				$scope.hasGender = true;
+			} else if ($scope.credentials.gender === 'female') {
+				$scope.salutations = ['Miss', 'Ms', 'Mrs', 'Madame', 'Seniora'];
+				$scope.credentials.salutation = $scope.salutations[0];
+				$scope.hasGender = true;
+			}
+		};
+
+
 	}
 ]);
 'use strict';
