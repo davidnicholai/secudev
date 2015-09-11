@@ -669,7 +669,7 @@ angular.module('users').controller('SettingsController', ['$scope', '$http', '$l
 		// Update a user profile
 		$scope.updateUserProfile = function(isValid) {
 			if (isValid) {
-				$scope.success = $scope.error = null;
+				$scope.success = $scope.error = null;	
 				var user = new Users($scope.credentials);
 
 				user.$update(function(response) {

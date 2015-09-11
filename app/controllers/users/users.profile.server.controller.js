@@ -31,6 +31,13 @@ exports.update = function(req, res) {
 	var message = null;
 	var logout = false;
 
+	if (user.roles === 'user' && req.body.roles === 'admin') {
+		delete req.body.roles;
+		return res.status(403).send({
+			message: 'Huy bawal \'yan!  Hanggang user ka lang.'
+		});
+	}
+
 	if (user.roles === 'admin' && req.body.roles === 'user')
 		logout = true;
 
@@ -53,7 +60,9 @@ exports.update = function(req, res) {
 				} else {				
 					req.login(user, function(err) {
 						if (err) {
-							res.status(400).send(err);
+							res.status(400).send({
+								message: errorHandler.getErrorMessage(err)
+							});
 						} else {
 							res.json(user);
 						}					
