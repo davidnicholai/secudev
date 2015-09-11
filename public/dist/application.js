@@ -532,21 +532,17 @@ angular.module('users').controller('ProfileController', ['$scope', '$location', 
 		};
 
 		//
-		var count = 0;
 		$scope.createBoard = function() {
-			$scope.message = $scope.message + ' ' + count;
-			count++;
 			// Create new Board object
 			var board = new Boards ({
 				message: this.message
 			});
 
 			// Redirect after save
-			board.$save(function(response) {
-				// $location.path('boards/' + response._id);
-
+			board.$save(function(response) {				
+				$window.location.reload();
 				// Clear form fields
-				// $scope.message = '';
+				$scope.message = '';
 			}, function(errorResponse) {
 				$scope.error = errorResponse.data.message;
 			});
@@ -555,7 +551,7 @@ angular.module('users').controller('ProfileController', ['$scope', '$location', 
 
 		// Remove existing Board
 		$scope.removeBoard = function(boardId) {
-			$http.delete('/boards/' + boardId).success(function(respones) {
+			$http.delete('/boards/' + boardId).success(function(response) {
 				$window.location.reload();
 			}).error(function(err) {
 				alert(err);
