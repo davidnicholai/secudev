@@ -1,19 +1,19 @@
 <section class="row" data-ng-controller="ProfileController" data-ng-init="loadMessages()">
 	<div class="jumbotron">
-	<h3>{{authentication.user.salutation}} {{authentication.user.firstName}} {{authentication.user.lastName}} ({{authentication.user.username}})
-		<small>
-			Gender: {{gender}} |
-			Birthday: {{authentication.user.birthday | date: 'MM/dd/yyyy'}}
-		</small>
-	</h3>	
-	<h5>{{authentication.user.description}}</h5>
-	<span class="text-right">
-		<a href="/#!/settings/profile">Edit profile</a>
-		<span ng-show="authentication.user.roles === 'admin'">
-			/
-			<a href="/#!/signup">Register another user</a>
+		<h3>{{authentication.user.salutation}} {{authentication.user.firstName}} {{authentication.user.lastName}} ({{authentication.user.username}})
+			<small>
+				Gender: {{gender}} |
+				Birthday: {{authentication.user.birthday | date: 'MM/dd/yyyy'}}
+			</small>
+		</h3>	
+		<h5>{{authentication.user.description}}</h5>
+		<span class="text-right">
+			<a href="/#!/settings/profile">Edit profile</a>
+			<span ng-show="authentication.user.roles === 'admin'">
+				/
+				<a href="/#!/signup">Register another user</a>
+			</span>
 		</span>
-	</span>
 	</div>
 
 	<!-- <hr> -->

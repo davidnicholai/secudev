@@ -1,18 +1,11 @@
 <section class="row" data-ng-controller="ProfileController" data-ng-init="loadProfile()">
-	<script>alert('bakla');</script>
-	<h1>{{user.salutation}} {{user.firstName}} {{user.lastName}}</h1>
-	<hr>
-	Birthday: {{user.birthday | date: 'longDate'}}
-	<br>
-	Username: {{user.username}}
-	<br>
-	Role: {{user.roles}}
-	<br>
-	Gender: {{user.gender}}
-	<br>
-	Description: {{user.description}}
-	<br>
-	Account created on: {{user.created | date: 'medium'}}
-	<br>
-	User ID: {{user._id}}
+	<div class="jumbotron">
+		<h3>{{user.salutation}} {{user.firstName}} {{user.lastName}} ({{user.username}})
+			<small>
+				Gender: {{othergender}} |
+				Birthday: {{user.birthday | date: 'MM/dd/yyyy'}}
+			</small>
+		</h3>	
+		<h5>{{user.description}}</h5>
+	</div>
 </section>

@@ -20,6 +20,12 @@ angular.module('users').controller('ProfileController', ['$scope', '$location', 
 			$http.get('/users/' + $stateParams.username).success(function(response) {
 				console.log(response);
 				$scope.user = response;
+
+				if ($scope.user.gender === 'male') {
+					$scope.othergender = 'M';
+				}
+				else if ($scope.user.gender === 'female')
+					$scope.othergender = 'F';
 			});
 		};
 
