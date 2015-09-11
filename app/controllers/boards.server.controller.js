@@ -70,7 +70,8 @@ exports.read = function(req, res) {
  * Update a Board
  */
 exports.update = function(req, res) {
-	var board = req.board ;
+	var board = req.board;
+	req.body.updated = Date.now();
 
 	board = _.extend(board , req.body);
 
