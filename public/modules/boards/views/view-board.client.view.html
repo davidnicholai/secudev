@@ -1,6 +1,6 @@
 <section data-ng-controller="BoardsController" data-ng-init="findOne()">
 	<div class="page-header">
-		<h1 data-ng-bind="board.message"></h1>
+		<span data-ng-bind-html="board.message"></span>
 	</div>
 	<div class="pull-right" data-ng-show="((authentication.user) && (authentication.user._id == board.user._id || authentication.user.roles == 'admin'))">
 		<a class="btn btn-primary" href="/#!/boards/{{board._id}}/edit">
@@ -13,9 +13,14 @@
 	<small>
 		<em class="text-muted">
 			Posted on
-			<span data-ng-bind="board.created | date:'mediumDate'"></span>
+			<span data-ng-bind="board.created | date:'medium'"></span>
 			by
 			{{board.user.firstName}} {{board.user.lastName}}
+		</em>
+		<em class="text-muted" data-ng-show="board.created !== board.updated">
+			<br>
+			Last Updated on
+			<span data-ng-bind="board.updated | date:'medium'"></span>
 		</em>
 	</small>
 	
