@@ -538,6 +538,7 @@ angular.module('users').controller('ProfileController', ['$scope', '$location', 
 		};
 
 		//
+		
 		$scope.createBoard = function() {
 			// Create new Board object
 			var board = new Boards ({

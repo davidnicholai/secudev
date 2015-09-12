@@ -15,8 +15,6 @@
 			</span>
 		</span>
 	</div>
-
-	<!-- <hr> -->
 	
 	<form data-ng-submit="createBoard()" novalidate>
 		<fieldset>
@@ -33,7 +31,6 @@
 			</div>
 		</fieldset>
 	</form>
-
 	<hr>
 
     <div class="text-center">
@@ -44,19 +41,27 @@
 		<a data-ng-repeat="board in boards" data-ng-href="#!/boards/{{board._id}}" class="list-group-item">
 			<table>
 				<tr>
-					<td class="right-margin"><a data-ng-href="#!/profile/{{board.user.username}}" target="_blank">{{board.user.firstName}}</td>
-					<td class="left-border">Created: {{board.created | date: 'MMM dd, yyyy h:mm a'}}</td>
-					<td class="outliers" data-ng-show="authentication.user.username === board.user.username || authentication.user.roles === 'admin'"><a data-ng-href="#!/boards/{{board._id}}/edit">Edit</a> / <a data-ng-click="removeBoard(board._id)">Delete</a></td>
-				</tr>
-				<tr>
-					<td class="right-margin"><a data-ng-href="#!/profile/{{board.user.username}}" target="_blank">{{board.user.username}}</td>
-					<td class="left-border" data-ng-bind="board.message"></td>
-					<td>&nbsp;</td>
-				</tr>
-				<tr>
-					<td class="right-margin" data-ng-bind="board.user.created | date: 'MMM dd, yyyy'"></td>
-					<td class="left-border">Updated: {{board.updated | date: 'MMM dd, yyyy h:mm a'}}</td>
-					<td>&nbsp;</td>
+					<td valign="top" class="right-margin">
+						<a data-ng-href="#!/profile/{{board.user.username}}" target="_blank">{{board.user.firstName}}</a>
+						<br>
+						<a data-ng-href="#!/profile/{{board.user.username}}" target="_blank">{{board.user.username}}</a>
+						<br>
+						Joined: {{board.user.created | date: 'MMM dd, yyyy'}}
+					</td>
+					<td class="left-border" valign="top">
+						<i><small>Created: {{board.created | date: 'MMM dd, yyyy h:mm a'}}</small></i>
+						<hr>
+						<span data-ng-bind-html="board.message"></span>
+						<span data-ng-show="board.updated !== board.created">
+						<hr>
+							<i><small>Updated: {{board.updated | date: 'MMM dd, yyyy h:mm a'}}</small></i>
+						</span>
+					</td>
+					<td class="outliers" data-ng-show="authentication.user.username === board.user.username || authentication.user.roles === 'admin'">
+						<a data-ng-href="#!/boards/{{board._id}}/edit">Edit</a>
+						/
+						<a data-ng-click="removeBoard(board._id)">Delete</a>
+					</td>
 				</tr>
 			</table>
 		</a>
