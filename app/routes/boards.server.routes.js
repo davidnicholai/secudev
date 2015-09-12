@@ -10,10 +10,10 @@ module.exports = function(app) {
 		.post(users.requiresLogin, boards.create);
 
 	app.route('/boards/count')
-		.get(boards.getCount);
+		.get(users.requiresLogin, boards.getCount);
 	
 	app.route('/boards/page/:pageNo')
-		.get(boards.limitedList);
+		.get(users.requiresLogin, boards.limitedList);
 
 	app.route('/boards/:boardId')
 		.get(boards.read)
