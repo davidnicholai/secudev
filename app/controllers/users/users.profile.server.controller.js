@@ -56,8 +56,10 @@ exports.update = function(req, res) {
 
 				if (logout) {
 					req.logout();
-					res.redirect('/#!/signin');
-				} else {				
+					return res.status(200).send({
+						message: 'Refresh'
+					});
+				} else {
 					req.login(user, function(err) {
 						if (err) {
 							res.status(400).send({
@@ -65,7 +67,7 @@ exports.update = function(req, res) {
 							});
 						} else {
 							res.json(user);
-						}					
+						}
 					});
 				}
 			}

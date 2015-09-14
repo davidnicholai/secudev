@@ -6,7 +6,7 @@ module.exports = function(app) {
 
 	// Boards Routes
 	app.route('/boards')
-		.get(boards.list)
+		.get(users.requiresLogin, boards.list)
 		.post(users.requiresLogin, boards.create);
 
 	app.route('/boards/count')
@@ -16,7 +16,7 @@ module.exports = function(app) {
 		.get(users.requiresLogin, boards.limitedList);
 
 	app.route('/boards/:boardId')
-		.get(boards.read)
+		.get(users.requiresLogin, boards.read)
 		.put(users.requiresLogin, boards.hasAuthorization, boards.update)
 		.delete(users.requiresLogin, boards.hasAuthorization, boards.delete);
 

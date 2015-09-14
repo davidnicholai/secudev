@@ -210,7 +210,8 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 		// This provides Authentication context.
 		$scope.authentication = Authentication;
 
-		if ($scope.authentication) $location.path('/profile'); // If user is logged in, bring him to his profile
+		if ($scope.authentication.user)
+			$location.path('/profile'); // If user is logged in, bring him to his profile
 	}
 ]);
 'use strict';
@@ -682,7 +683,8 @@ angular.module('users').controller('SettingsController', ['$scope', '$http', '$l
 				user.$update(function(response) {
 					$scope.success = true;
 					Authentication.user = response;
-					$location.path('/profile');
+					if (response.message === 'Refresh')
+						$location.path('/signin');
 				}, function(response) {
 					$scope.error = response.data.message;
 				});

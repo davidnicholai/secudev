@@ -89,7 +89,8 @@ angular.module('users').controller('SettingsController', ['$scope', '$http', '$l
 				user.$update(function(response) {
 					$scope.success = true;
 					Authentication.user = response;
-					$location.path('/profile');
+					if (response.message === 'Refresh')
+						$location.path('/signin');
 				}, function(response) {
 					$scope.error = response.data.message;
 				});
