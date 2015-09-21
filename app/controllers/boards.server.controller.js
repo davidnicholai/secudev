@@ -6,7 +6,8 @@
 var mongoose = require('mongoose'),
 	errorHandler = require('./errors.server.controller'),
 	Board = mongoose.model('Board'),
-	_ = require('lodash');
+	_ = require('lodash'),
+	sanitizeHTML = require('sanitize-html');
 
 exports.getCount = function(req, res) {
 	Board.count(function(err, count) {
@@ -45,6 +46,14 @@ exports.limitedList = function(req, res) {
  * Create a Board
  */
 exports.create = function(req, res) {
+	var cleanMessage = sanitizeHTML(req.body.message, {
+		allowedTags: [ 'b', 'i', 'em', 'strong', 'a', 'img' ],
+		allowedAttributes: {
+			'a': [ 'href' ],
+			'img': [ 'src' ]
+		}
+	});
+	req.body.message = cleanMessage; // Sanitize the html tags inputted by the user.
 	var board = new Board(req.body);
 	board.user = req.user;
 
@@ -70,10 +79,18 @@ exports.read = function(req, res) {
  * Update a Board
  */
 exports.update = function(req, res) {
+	var cleanMessage = sanitizeHTML(req.body.message, {
+		allowedTags: [ 'b', 'i', 'em', 'strong', 'a', 'img' ],
+		allowedAttributes: {
+			'a': [ 'href' ],
+			'img': [ 'src' ]
+		}
+	});
+	req.body.message = cleanMessage; // Sanitize the html tags inputted by the user.
 	var board = req.board;
 	req.body.updated = Date.now();
 
-	board = _.extend(board , req.body);
+	board = _.extend(board, req.body);
 
 	board.save(function(err) {
 		if (err) {
