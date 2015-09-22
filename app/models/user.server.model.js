@@ -17,6 +17,8 @@ var validateMaxLength = function(property) {
 		return false;
 	if (property.length <= 0)
 		return false;
+	if (!property.match(/^[A-Za-z ]+$/))
+		return false;
 	
 	return true;
 };
@@ -82,13 +84,13 @@ var UserSchema = new Schema({
 		type: String,
 		trim: true,
 		default: '',
-		validate: [validateMaxLength, 'Please fill in your first name and it should not be longer than 50 characters.']
+		validate: [validateMaxLength, 'Please make sure your first name is comprised of letters only.']
 	},
 	lastName: {
 		type: String,
 		trim: true,
 		default: '',
-		validate: [validateMaxLength, 'Please fill in your last name and it should not be longer than 50 characters.']
+		validate: [validateMaxLength, 'Please make sure your last name is comprised of letters only.']
 	},
 	gender: {
 		type: String,

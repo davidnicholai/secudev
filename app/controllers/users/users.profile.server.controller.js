@@ -28,8 +28,13 @@ exports.getUser = function(req, res) {
  */
 exports.update = function(req, res) {
 	var user = req.user;
-	var message = null;
 	var logout = false;
+
+	if (req.body.id !== req.user.id) {
+		return res.status(403).send({
+			message: 'Current user is not the same as the one being edited. Please refresh the page.'
+		});
+	}
 
 	if (user.roles === 'user' && req.body.roles === 'admin') {
 		delete req.body.roles;

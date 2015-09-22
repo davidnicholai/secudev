@@ -84,6 +84,7 @@ angular.module('users').controller('SettingsController', ['$scope', '$http', '$l
 		$scope.updateUserProfile = function(isValid) {
 			if (isValid) {
 				$scope.success = $scope.error = null;	
+				$scope.credentials.id = $scope.user._id;
 				var user = new Users($scope.credentials);
 
 				user.$update(function(response) {
