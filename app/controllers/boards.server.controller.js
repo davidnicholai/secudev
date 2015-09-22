@@ -46,6 +46,14 @@ exports.limitedList = function(req, res) {
  * Create a Board
  */
 exports.create = function(req, res) {
+	console.log(req.body.id);
+	console.log(req.user.id);
+	if (req.body.id !== req.user.id) {
+		return res.status(400).send({
+			message: 'Different user detected. Please refresh the page.'
+		});
+	}
+
 	var cleanMessage = sanitizeHTML(req.body.message, {
 		allowedTags: [ 'b', 'i', 'em', 'strong', 'a', 'img' ],
 		allowedAttributes: {
