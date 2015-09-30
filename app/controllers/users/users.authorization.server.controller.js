@@ -34,6 +34,16 @@ exports.requiresLogin = function(req, res, next) {
 	next();
 };
 
+exports.requiresAdmin = function(req, res, next) {
+	if (req.user.roles === 'admin') {
+		next();
+	} else {
+		return res.status(401).send({
+			message: 'User is not an admin'
+		});
+	}
+};
+
 /**
  * User authorizations routing middleware
  */

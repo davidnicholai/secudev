@@ -1,0 +1,89 @@
+<section class="row" ng-controller="BoardsController">
+  <div class="col-md-12">
+    <h1>Search</h1>
+    <small>
+      username can be 'david'
+      <br>
+      >= and <= date can only be '01/01/1990' (only mm/dd/yyyy format)
+      <br>
+      bet. 2 dates can only be '01/01/1990 to 01/02/1990' (only mm/dd/yyyy format)
+    </small>
+    <hr>
+  </div>
+  <div class="col-md-6">
+    <form>
+      <fieldset>
+        <div class="form-group">
+          <input type="text" ng-model="mainQuery" class="form-control" placeholder="Search query...">
+        </div>
+
+        <div class="form-group">
+          <strong>Advanced</strong>
+          <small>
+            <button class="btn btn-default btn-xs" ng-click="addOption()">
+              <span class="glyphicon glyphicon-plus"></span>
+            </button>
+          </small>
+        </div>
+
+        <div class="form-group" ng-repeat="option in options">
+          <div class="form-inline">
+            <div class="form-group">
+              <select class="form-control" ng-model="option.type" ng-options="ad for ad in advancedOptions"></select>
+            </div>
+            <div class="form-group">
+              <input type="text" ng-model="option.text" class="form-control">
+            </div>
+            <div class="form-group">
+              <select class="form-control" ng-model="option.operand" ng-options="andor for andor in operands"></select>
+            </div>
+            <div class="form-group">
+              <button class="btn btn-danger" ng-click="removeOption(option)">
+                <span class="glyphicon glyphicon-minus"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <button class="btn btn-primary" ng-click="startSearch()">Search</button>
+        </div>
+
+        <div data-ng-show="error" class="form-group text-center text-danger">
+          <strong data-ng-bind="error"></strong>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+
+  <div class="list-group col-md-12">
+    <a data-ng-repeat="board in boards" data-ng-href="#!/boards/{{board._id}}" class="list-group-item">
+      <table>
+        <tr>
+          <td valign="top" class="right-margin">
+            <a data-ng-href="#!/profile/{{board.user.username}}" target="_blank">{{board.user.firstName}}</a>
+            <br>
+            <a data-ng-href="#!/profile/{{board.user.username}}" target="_blank">{{board.user.username}}</a>
+            <br>
+            Joined: {{board.user.created | date: 'MMM dd, yyyy'}}
+          </td>
+          <td class="left-border" valign="top">
+            <i><small>Created: {{board.created | date: 'MMM dd, yyyy h:mm a'}}</small></i>
+            <br><br>
+            <span data-ng-bind-html="board.message"></span>
+            <span data-ng-show="board.updated !== board.created">
+              <hr>
+              <i><small>Updated: {{board.updated | date: 'MMM dd, yyyy h:mm a'}}</small></i>
+            </span>
+            <br><br>
+          </td>
+          <td class="outliers" data-ng-show="authentication.user.username === board.user.username || authentication.user.roles === 'admin'">
+            <a data-ng-href="#!/boards/{{board._id}}/edit">Edit</a>
+            /
+            <a data-ng-click="removeBoard(board._id)">Delete</a>
+          </td>
+        </tr>
+      </table>
+    </a>
+  </div>
+</section>

@@ -13,6 +13,14 @@ angular.module('boards').config(['$stateProvider',
 			url: '/boards/create',
 			templateUrl: 'modules/boards/views/create-board.client.view.html'
 		}).
+		state('searchBoard', {
+			url: '/boards/search',
+			templateUrl: 'modules/boards/views/search-board.client.view.html'
+		}).
+		state('backupBoard', {
+			url: '/boards/backup',
+			templateUrl: 'modules/boards/views/backup-board.client.view.html'
+		}).
 		state('viewBoard', {
 			url: '/boards/:boardId',
 			templateUrl: 'modules/boards/views/view-board.client.view.html'

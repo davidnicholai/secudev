@@ -1,0 +1,25 @@
+<section data-ng-controller="BoardsAdminController" ng-init="getBackups()">
+  <br>
+  <button class="btn btn-info" ng-click="backupPosts()">Create a Backup</button>
+  <hr>
+  <div class="row">
+    <div class="col-md-4">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>File Name (yyyy-mm-dd-hh-mm-ss)</th>
+            <th>&nbsp;</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="file in files.files">
+            <td ng-bind="file"></td>
+            <td class="text-right"><button class="btn btn-info" ng-click="download(file)">
+              <span class="glyphicon glyphicon-download"></span>
+            </button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
