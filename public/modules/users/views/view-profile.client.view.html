@@ -6,7 +6,7 @@
         Gender: {{gender}} |
         Birthday: {{authentication.user.birthday | date: 'MM/dd/yyyy'}}
       </small>
-    </h3> 
+    </h3>
     <h5>{{authentication.user.description}}</h5>
     <span class="text-right">
       <a href="/#!/boards/search">Search post</a>
@@ -19,6 +19,10 @@
         <a href="/#!/boards/backup">Backup posts</a>
       </span>
     </span>
+
+    <form action="/auth/signout" method="POST">
+      <input type="submit" class="btn btn-warning btn-xs" value="Sign out">
+    </form>
   </div>
   
   <form data-ng-submit="createBoard()" novalidate>

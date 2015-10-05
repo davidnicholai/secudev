@@ -79,6 +79,14 @@ angular.module('boards').config(['$stateProvider',
 			url: '/boards/create',
 			templateUrl: 'modules/boards/views/create-board.client.view.html'
 		}).
+		state('searchBoard', {
+			url: '/boards/search',
+			templateUrl: 'modules/boards/views/search-board.client.view.html'
+		}).
+		state('backupBoard', {
+			url: '/boards/backup',
+			templateUrl: 'modules/boards/views/backup-board.client.view.html'
+		}).
 		state('viewBoard', {
 			url: '/boards/:boardId',
 			templateUrl: 'modules/boards/views/view-board.client.view.html'
@@ -92,68 +100,140 @@ angular.module('boards').config(['$stateProvider',
 'use strict';
 
 // Boards controller
-angular.module('boards').controller('BoardsController', ['$scope', '$stateParams', '$location', 'Authentication', 'Boards',
-	function($scope, $stateParams, $location, Authentication, Boards) {
-		$scope.authentication = Authentication;
+angular.module('boards').controller('BoardsAdminController', ['$scope', '$location', 'Authentication', 'Boards', '$http', '$window',
+  function($scope, $location, Authentication, Boards, $http, $window) {
+    $scope.authentication = Authentication;
 
-		// Create new Board
-		$scope.create = function() {
-			// Create new Board object
-			var board = new Boards ({
-				message: this.message
-			});
+    // if ($scope.authentication.user.roles !== 'admin') $location.path('/');
 
-			// Redirect after save
-			board.$save(function(response) {
-				$location.path('boards/' + response._id);
+    $scope.getBackups = function() {
+      $http.get('/boards/backup').success(function(response) {
+        $scope.files = response;
+      });
+    };
 
-				// Clear form fields
-				$scope.message = '';
-			}, function(errorResponse) {
-				$scope.error = errorResponse.data.message;
-			});
-		};
+    $scope.backupPosts = function() {
+      $http.post('/boards/backup').success(function(response) {
+        $window.location.reload();
+      }).error(function(response) {
+        console.log(response.message);
+      });
+    };
 
-		// Remove existing Board
-		$scope.remove = function(board) {
-			if ( board ) { 
-				board.$remove();
+    $scope.download = function(fileName) {
+      $http.get('/boards/backup/' + fileName).success(function(response) {
+        console.log(response);
+        var element = angular.element('<a/>');
+        element.attr({
+          href: 'data:application/csv,' + encodeURIComponent(response),
+          target: '_blank',
+          download: fileName
+        })[0].click();
+      });
+    };
+    
+  }
+]);
+'use strict';
 
-				for (var i in $scope.boards) {
-					if ($scope.boards [i] === board) {
-						$scope.boards.splice(i, 1);
-					}
-				}
-			} else {
-				$scope.board.$remove(function() {
-					$location.path('boards');
-				});
-			}
-		};
+// Boards controller
+angular.module('boards').controller('BoardsController', ['$scope', '$stateParams', '$location', 'Authentication', 'Boards', '$http',
+  function($scope, $stateParams, $location, Authentication, Boards, $http) {
+    $scope.authentication = Authentication;
 
-		// Update existing Board
-		$scope.update = function() {
-			var board = $scope.board;
+    $scope.options = [];
+    $scope.advancedOptions = ['username', '>= date', '<= date', 'between 2 dates'];
+    $scope.operands = ['OR', 'AND'];
+    $scope.addOption = function() {
+      var lastIndex = $scope.options.length;
+      $scope.options[lastIndex] = {};
+      $scope.options[lastIndex].index = lastIndex; // Need this to identify which one will be removed
+      $scope.options[lastIndex].type = $scope.advancedOptions[0];
+      $scope.options[lastIndex].operand = $scope.operands[0];
+      $scope.options[lastIndex].text = '';
+    };
 
-			board.$update(function() {
-				$location.path('boards/' + board._id);
-			}, function(errorResponse) {
-				$scope.error = errorResponse.data;
-			});
-		};
+    $scope.removeOption = function(option) {
+      $scope.options.splice(option.index, 1);
 
-		// Find a list of Boards
-		$scope.find = function() {
-			$scope.boards = Boards.query();
-		};
+      for (var i = 0; i < $scope.options.length; i++) { // Update the indices of options
+        $scope.options[i].index = i;
+      }
+    };
 
-		// Find existing Board
-		$scope.findOne = function() {
-			$scope.board = Boards.get({ 
-				boardId: $stateParams.boardId
-			});
-		};
-	}
+    $scope.startSearch = function() {
+      var query = {
+        mainQuery: $scope.mainQuery,
+        advancedOptions: $scope.options
+      };
+      $http.post('/boards/search', query).success(function(response) {
+        $scope.error = null;
+        $scope.boards = response;
+        if ($scope.boards.length === 0)
+          $scope.error = 'No hits';
+      }).error(function(response) {
+        $scope.error = response.message;
+      });
+    };
+
+    // Create new Board
+    $scope.create = function() {
+      // Create new Board object
+      var board = new Boards ({
+        message: this.message
+      });
+
+      // Redirect after save
+      board.$save(function(response) {
+        $location.path('boards/' + response._id);
+
+        // Clear form fields
+        $scope.message = '';
+      }, function(errorResponse) {
+        $scope.error = errorResponse.data.message;
+      });
+    };
+
+    // Remove existing Board
+    $scope.remove = function(board) {
+      if ( board ) { 
+        board.$remove();
+
+        for (var i in $scope.boards) {
+          if ($scope.boards [i] === board) {
+            $scope.boards.splice(i, 1);
+          }
+        }
+      } else {
+        $scope.board.$remove(function() {
+          $location.path('boards');
+        });
+      }
+    };
+
+    // Update existing Board
+    $scope.update = function() {
+      var board = $scope.board;
+
+      board.$update(function() {
+        $location.path('boards/' + board._id);
+      }, function(errorResponse) {
+        $scope.error = errorResponse.data;
+      });
+    };
+
+    // Find a list of Boards
+    $scope.find = function() {
+      $scope.boards = Boards.query();
+    };
+
+    // Find existing Board
+    $scope.findOne = function() {
+      $scope.board = Boards.get({ 
+        boardId: $stateParams.boardId
+      });
+    };
+  }
 ]);
 'use strict';
 
@@ -510,88 +590,92 @@ angular.module('users').controller('PasswordController', ['$scope', '$stateParam
 'use strict';
 
 angular.module('users').controller('ProfileController', ['$scope', '$location', 'Authentication', '$http', '$stateParams', 'Boards', '$window',
-	function($scope, $location, Authentication, $http, $stateParams, Boards, $window) {
-		$scope.authentication = Authentication;
+  function($scope, $location, Authentication, $http, $stateParams, Boards, $window) {
+    $scope.authentication = Authentication;
 
-		// If user is not signed in then redirect to signin page
-		if (!$scope.authentication.user) $location.path('/signin');
+    // If user is not signed in then redirect to signin page
+    if (!$scope.authentication.user) $location.path('/signin');
 
-		if ($scope.authentication.user) {
-			if ($scope.authentication.user.gender === 'male')
-				$scope.gender = 'M';
-			else if ($scope.authentication.user.gender === 'female')
-				$scope.gender = 'F';
-		}
+    if ($scope.authentication.user) {
+      if ($scope.authentication.user.gender === 'male')
+        $scope.gender = 'M';
+      else if ($scope.authentication.user.gender === 'female')
+        $scope.gender = 'F';
+    }
 
-		//
+    //
 
-		$scope.loadProfile = function() {
-			$http.get('/users/' + $stateParams.username).success(function(response) {
-				console.log(response);
-				$scope.user = response;
+    $scope.loadProfile = function() {
+      $http.get('/users/' + $stateParams.username).success(function(response) {
+        console.log(response);
+        $scope.user = response;
 
-				if ($scope.user.gender === 'male') {
-					$scope.othergender = 'M';
-				}
-				else if ($scope.user.gender === 'female')
-					$scope.othergender = 'F';
-			});
-		};
+        if ($scope.user.gender === 'male') {
+          $scope.othergender = 'M';
+        }
+        else if ($scope.user.gender === 'female')
+          $scope.othergender = 'F';
+      });
+    };
 
-		//
-		
-		$scope.createBoard = function() {
-			// Create new Board object
-			var board = new Boards ({
-				id: $scope.authentication.user._id,
-				message: this.message
-			});
+    //
+    
+    $scope.createBoard = function() {
+      // Create new Board object
+      var board = new Boards ({
+        id: $scope.authentication.user._id,
+        message: this.message
+      });
 
-			// Redirect after save
-			board.$save(function(response) {				
-				$window.location.reload();
-				// Clear form fields
-				$scope.message = '';
-			}, function(errorResponse) {
-				$scope.error = errorResponse.data.message;
-			});
+      // Redirect after save
+      board.$save(function(response) {        
+        $window.location.reload();
+        // Clear form fields
+        $scope.message = '';
+      }, function(errorResponse) {
+        $scope.error = errorResponse.data.message;
+      });
 
-		};
+    };
 
-		// Remove existing Board
-		$scope.removeBoard = function(boardId) {
-			$http.delete('/boards/' + boardId).success(function(response) {
-				$window.location.reload();
-			}).error(function(err) {
-				alert(err);
-			});
-		};
+    // Remove existing Board
+    $scope.removeBoard = function(boardId) {
+      $http.delete('/boards/' + boardId).success(function(response) {
+        $window.location.reload();
+      }).error(function(err) {
+        alert(err);
+      });
+    };
 
-		//
+    //
 
-		$scope.currentPage = 1;
-        $scope.maxSize = 5;
+    $scope.currentPage = 1;
+    $scope.maxSize = 5;
 
-        $http.get('/boards/count').success(function(response) {
-            $scope.totalItems = response.count;
-        });
+    $http.get('/boards/count').success(function(response) {
+        $scope.totalItems = response.count;
+    });
 
-        $scope.setPage = function(pageNo) {
-        	$scope.currentPage = pageNo;
-        };
+    $scope.setPage = function(pageNo) {
+      $scope.currentPage = pageNo;
+    };
 
-        $scope.pageChanged = function() {
-        	$scope.loadMessages();
-        };
+    $scope.pageChanged = function() {
+      $scope.loadMessages();
+    };
 
-        $scope.loadMessages = function() {
-        	$http.get('/boards/page/' + $scope.currentPage).success(function(response) {
-        		$scope.boards = response;
-        	});
-        };
+    $scope.loadMessages = function() {
+      $http.get('/boards/page/' + $scope.currentPage).success(function(response) {
+        $scope.boards = response;
+      });
+    };
 
-        // 
-	}
+    //
+
+    $scope.searchPost = function() {
+      console.log($scope.search.message);
+    };
+  }
 ]);
 'use strict';
 
