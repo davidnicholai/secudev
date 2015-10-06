@@ -14,7 +14,7 @@ var mongoose = require('mongoose'),
 exports.downloadFile = function(req, res) {
   // In C:\meanjs\secudev-case1\backups\<CSV files>
   // Make sure the 'backups' folder already exists
-  var fileName = 'backups\\' + req.params.fileName;
+  var fileName = 'backups/' + req.params.fileName;
   res.download(fileName);
 };
 
@@ -22,7 +22,7 @@ exports.backup = function(req, res) {
   var d = new Date();
   var fileName = d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate() + '-' + d.getHours() + '-' + d.getMinutes() + '-' + d.getSeconds();
   Board.findAndStreamCsv()
-      .pipe(fs.createWriteStream('backups\\backup-' + fileName + '.csv'));
+      .pipe(fs.createWriteStream('backups/backup-' + fileName + '.csv'));
 
   res.status(200).send('OK');
 };
