@@ -218,7 +218,7 @@ angular.module('boards').controller('BoardsController', ['$scope', '$stateParams
       board.$update(function() {
         $location.path('boards/' + board._id);
       }, function(errorResponse) {
-        $scope.error = errorResponse.data;
+        $scope.error = errorResponse.data.message;
       });
     };
 
@@ -266,21 +266,27 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
 ]);
 'use strict';
 
-angular.module('core').controller('HeaderController', ['$scope', 'Authentication', 'Menus',
-	function($scope, Authentication, Menus) {
-		$scope.authentication = Authentication;
-		$scope.isCollapsed = false;
-		$scope.menu = Menus.getMenu('topbar');
+angular.module('core').controller('HeaderController', ['$scope', 'Authentication', 'Menus', '$http', '$location',
+  function($scope, Authentication, Menus, $http, $location) {
+    $scope.authentication = Authentication;
+    $scope.isCollapsed = false;
+    $scope.menu = Menus.getMenu('topbar');
 
-		$scope.toggleCollapsibleMenu = function() {
-			$scope.isCollapsed = !$scope.isCollapsed;
-		};
+    $scope.toggleCollapsibleMenu = function() {
+      $scope.isCollapsed = !$scope.isCollapsed;
+    };
 
-		// Collapsing the menu after navigation
-		$scope.$on('$stateChangeSuccess', function() {
-			$scope.isCollapsed = false;
-		});
-	}
+    // Collapsing the menu after navigation
+    $scope.$on('$stateChangeSuccess', function() {
+      $scope.isCollapsed = false;
+    });
+
+    $scope.signout = function() {
+      $http.post('/auth/signout').success(function() {
+        $location.path('/');
+      });
+    };
+  }
 ]);
 'use strict';
 
