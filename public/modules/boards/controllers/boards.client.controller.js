@@ -82,7 +82,7 @@ angular.module('boards').controller('BoardsController', ['$scope', '$stateParams
       board.$update(function() {
         $location.path('boards/' + board._id);
       }, function(errorResponse) {
-        $scope.error = errorResponse.data;
+        $scope.error = errorResponse.data.message;
       });
     };
 

@@ -242,6 +242,7 @@ exports.create = function(req, res) {
     }
   });
   req.body.message = cleanMessage; // Sanitize the html tags inputted by the user.
+  
   var board = new Board(req.body);
   board.user = req.user;
 
@@ -275,6 +276,8 @@ exports.update = function(req, res) {
     }
   });
   req.body.message = cleanMessage; // Sanitize the html tags inputted by the user.
+  // End of sanitation.
+
   var board = req.board;
   req.body.updated = Date.now();
 
