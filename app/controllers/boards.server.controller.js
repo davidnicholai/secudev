@@ -130,10 +130,8 @@ function compileQueries(mainQuery, queries) {
 
   str += '}';
 
-  console.log(str);
   str = JSON.parse(str);
   str.message = new RegExp(mainQuery, 'i');
-  console.log(str);
   return str;
 }
 

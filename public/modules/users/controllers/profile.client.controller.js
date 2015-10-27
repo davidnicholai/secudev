@@ -18,7 +18,6 @@ angular.module('users').controller('ProfileController', ['$scope', '$location', 
 
     $scope.loadProfile = function() {
       $http.get('/users/' + $stateParams.username).success(function(response) {
-        console.log(response);
         $scope.user = response;
 
         if ($scope.user.gender === 'male') {
@@ -29,59 +28,7 @@ angular.module('users').controller('ProfileController', ['$scope', '$location', 
       });
     };
 
-    //
-    
-    $scope.createBoard = function() {
-      // Create new Board object
-      var board = new Boards ({
-        id: $scope.authentication.user._id,
-        message: this.message
-      });
 
-      // Redirect after save
-      board.$save(function(response) {        
-        $window.location.reload();
-        // Clear form fields
-        $scope.message = '';
-      }, function(errorResponse) {
-        $scope.error = errorResponse.data.message;
-      });
-
-    };
-
-    // Remove existing Board
-    $scope.removeBoard = function(boardId) {
-      $http.delete('/boards/' + boardId).success(function(response) {
-        $window.location.reload();
-      }).error(function(err) {
-        alert(err);
-      });
-    };
-
-    //
-
-    $scope.currentPage = 1;
-    $scope.maxSize = 5;
-
-    $http.get('/boards/count').success(function(response) {
-        $scope.totalItems = response.count;
-    });
-
-    $scope.setPage = function(pageNo) {
-      $scope.currentPage = pageNo;
-    };
-
-    $scope.pageChanged = function() {
-      $scope.loadMessages();
-    };
-
-    $scope.loadMessages = function() {
-      $http.get('/boards/page/' + $scope.currentPage).success(function(response) {
-        $scope.boards = response;
-      });
-    };
-
-    //
 
     $scope.searchPost = function() {
       console.log($scope.search.message);

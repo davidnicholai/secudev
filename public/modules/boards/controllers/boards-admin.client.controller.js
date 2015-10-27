@@ -17,13 +17,12 @@ angular.module('boards').controller('BoardsAdminController', ['$scope', '$locati
       $http.post('/boards/backup').success(function(response) {
         $window.location.reload();
       }).error(function(response) {
-        console.log(response.message);
+        alert(response.message);
       });
     };
 
     $scope.download = function(fileName) {
       $http.get('/boards/backup/' + fileName).success(function(response) {
-        console.log(response);
         var element = angular.element('<a/>');
         element.attr({
           href: 'data:application/csv,' + encodeURIComponent(response),

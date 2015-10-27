@@ -1,6 +1,6 @@
 <section data-ng-controller="ProfileController" data-ng-init="loadMessages()">
 
-  <div class="jumbotron">    
+  <div class="jumbotron">
     <h3>{{authentication.user.salutation}} {{authentication.user.firstName}} {{authentication.user.lastName}} ({{authentication.user.username}})
       <small>
         Gender: {{gender}} |
@@ -9,69 +9,17 @@
     </h3>
     <h5>{{authentication.user.description}}</h5>
 
-    <span class="text-right">
-      <a href="/#!/settings/profile">Edit profile</a>
+    <div ng-show="authentication.user.roles === 'admin'">
+      <strong>Admin Console</strong>
       <br>
-      <a href="/#!/boards/search">Search post</a>
+      <a href="/#!/signup">Register another user</a>
       <br>
-      <span ng-show="authentication.user.roles === 'admin'">
-        <a href="/#!/signup">Register another user</a>
-        /        
-        <a href="/#!/boards/backup">Backup posts</a>
-      </span>
-    </span>
+      <a href="/#!/boards/backup">Backup posts</a>
+      <br>
+      <a href="/#!/shop/manage">Manage Shop</a>
+    </div>
   </div>
   
-  <form data-ng-submit="createBoard()" novalidate>
-    <fieldset>
-      <div class="form-group">
-        <div class="controls">
-          <textarea class="form-control" data-ng-model="message" id="message" placeholder="Allowed tags: <b> <i> <em> <strong> <a> <img>" rows=5></textarea>
-        </div>
-      </div>
-      <div class="form-group">
-        <input type="submit" class="btn btn-success">
-      </div>
-      <div data-ng-show="error" class="text-danger">
-        <strong data-ng-bind="error"></strong>
-      </div>
-    </fieldset>
-  </form>
-  <hr>
-
-  <div class="text-center">
-      <pagination ng-change="pageChanged()" total-items="totalItems" ng-model="currentPage" max-size="maxSize" boundary-links="true" direction-links="false" class="text-center"></pagination>
-  </div>
-
-  <div class="list-group">
-    <a data-ng-repeat="board in boards" data-ng-href="#!/boards/{{board._id}}" class="list-group-item">
-      <table>
-        <tr>
-          <td valign="top" class="right-margin">
-            <a data-ng-href="#!/profile/{{board.user.username}}" target="_blank">{{board.user.firstName}}</a>
-            <br>
-            <a data-ng-href="#!/profile/{{board.user.username}}" target="_blank">{{board.user.username}}</a>
-            <br>
-            Joined: {{board.user.created | date: 'MMM dd, yyyy'}}
-          </td>
-          <td class="left-border" valign="top">
-            <i><small>Created: {{board.created | date: 'MMM dd, yyyy h:mm a'}}</small></i>
-            <br><br>
-            <span data-ng-bind-html="board.message"></span>
-            <span data-ng-show="board.updated !== board.created">
-              <hr>
-              <i><small>Updated: {{board.updated | date: 'MMM dd, yyyy h:mm a'}}</small></i>
-            </span>
-            <br><br>
-          </td>
-          <td class="outliers" data-ng-show="authentication.user.username === board.user.username || authentication.user.roles === 'admin'">
-            <a data-ng-href="#!/boards/{{board._id}}/edit">Edit</a>
-            /
-            <a data-ng-click="removeBoard(board._id)">Delete</a>
-          </td>
-        </tr>
-      </table>
-    </a>
-  </div>
+  
 
 </section>

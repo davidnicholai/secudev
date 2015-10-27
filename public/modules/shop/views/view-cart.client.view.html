@@ -1,0 +1,58 @@
+<section ng-controller="CartController" ng-init="getCart();">
+  <!-- <h1>Cart</h1> -->
+  <br><br>
+
+  
+  <div class="col-md-12 alert alert-warning text-center" role="alert" ng-show="noItems">
+    <p>You don't have any items in your cart. Don't worry, we'll wait for you while you shop.
+  </div>
+  
+
+  <div class="col-md-8" ng-show="!noItems">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th class="text-center">&nbsp;</th>
+          <th class="text-center">Item Name</th>
+          <th class="text-center">Price</th>
+          <th class="text-center">Quantity</th>
+          <th class="text-center">&nbsp;</th>
+        </tr>
+        <tbody class="text-center">
+          <tr ng-repeat="item in orderInfo.content" class="row-cart">
+            <td class="col-img img-thumbnail"><img class="img-resize" ng-src="/static/images/{{item.itemInfo.image}}"></td>
+            <td class="col-item-name">
+              <a href="#!/shop/{{item.item}}">{{item.itemInfo.name}}</a>
+            </td>
+            <td>USD ${{item.itemInfo.price | number:2}}</td>
+            <td ng-bind="item.quantity"></td>
+            <td><button class="btn btn-danger btn-xs" ng-click="removeFromCart(item)"><span class="glyphicon glyphicon-remove"></span></button></td>
+          </tr>
+        </tbody>
+      </thead>
+    </table>
+  </div>
+
+  <div class="col-md-4 jumbotron container-cart-transaction" ng-show="!noItems">
+    <table class="table">
+      <thead>
+        <th>Item Name</th>
+        <th class="text-right">Price</th>
+      </thead>
+      <tbody>
+        <tr ng-repeat="item in orderInfo.content">
+          <td>{{item.itemInfo.name}}&nbsp;<em>x {{item.quantity}}&nbsp;pcs</em></td>
+          <td class="text-right">USD ${{item.itemInfo.price * item.quantity | number:2}}</td>
+        </tr>
+        <tr >
+          <td><strong>Total</strong></td>
+          <td class="text-right"><strong>USD ${{totalPrice | number:2}}</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <form action="/carts/checkout" method="GET">
+      <button type="submit" class="btn btn-warning btn-lg btn-block" ng-disabled="cannotCheckout">{{chkOutBtn}}</button>
+    </form>
+  </div>
+</section>

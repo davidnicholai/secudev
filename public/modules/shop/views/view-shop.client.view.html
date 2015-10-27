@@ -1,0 +1,67 @@
+<section data-ng-controller="ShopController" ng-init="find();">
+  
+  <br>
+  <div class="col-md-12 well">
+    <a class="btn btn-warning" href="#!/shop/cart">My Shopping Cart</a>
+  </div>
+
+  <div class="text-center row">
+    <h3>Donation</h3>
+    <small>Please donate to our organization!</small>
+
+    <div class="col-md-offset-4">
+    <div class="col-md-2">
+    <h3>$5</h3>
+    <form action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post" target="_top">
+    <input type="hidden" name="cmd" value="_s-xclick">
+    <input type="hidden" name="hosted_button_id" value="KMUKACM8MVFQ2">
+    <input type="image" src="https://www.sandbox.paypal.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+    <img alt="" border="0" src="https://www.sandbox.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
+    </form>
+    </div>
+
+    <div class="col-md-2">
+    <h3>$10</h3>
+    <form action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post" target="_top">
+    <input type="hidden" name="cmd" value="_s-xclick">
+    <input type="hidden" name="hosted_button_id" value="367JTF5KAWJCS">
+    <input type="image" src="https://www.sandbox.paypal.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+    <img alt="" border="0" src="https://www.sandbox.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
+    </form>
+    </div>
+
+    <div class="col-md-2">
+    <h3>$20</h3>
+    <form action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post" target="_top">
+    <input type="hidden" name="cmd" value="_s-xclick">
+    <input type="hidden" name="hosted_button_id" value="D4EEEG7GBZTN6">
+    <input type="image" src="https://www.sandbox.paypal.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+    <img alt="" border="0" src="https://www.sandbox.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
+    </form>
+    </div>
+  </div>
+
+
+  </div>
+
+  <hr>
+
+  <div class="text-center">
+    <h3>Shop</h3>
+    <small>Enjoy our finest items!</small>
+  </div>
+
+  <br>
+
+  <div class="list-group col-md-2 text-center" ng-repeat="item in items">
+    <a href="#!/shop/{{item._id}}" class="list-group-item">
+      <img ng-src="/static/images/{{item.image}}" class="img-thumbnail user-profile-picture">
+      <hr>
+      <h4 class="list-group-item-heading">{{item.name}}</h4>
+      <p class="list-group-item-text">USD ${{item.price | number:2}}</p>
+    </a>
+  </div>
+
+
+
+</section>

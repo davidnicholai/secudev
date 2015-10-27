@@ -1,0 +1,40 @@
+<section ng-controller="ShopController" ng-init="findItem();">
+  <br><br>
+
+  <div class="row">
+    <div class="col-md-12 alert alert-success text-center" role="alert" ng-show="success">
+      <span ng-bind="success"></span>
+    </div>
+    <div class="col-md-12 alert alert-danger text-center" role="alert" ng-show="error">
+      <span ng-bind="error"></span>
+    </div>
+    <div class="col-md-4">
+      <img ng-src="/static/images/{{item.image}}" class="item-image img-thumbnail">
+    </div>
+
+    <div class="col-md-8">
+      <h2>
+        <a href="#!/shop/manage/edit/{{item._id}}" class="btn btn-primary" ng-show="isAdmin">
+          <span class="glyphicon glyphicon-pencil"></span>
+        </a>
+        {{item.name}}
+        <small>Only for USD ${{item.price | number:2}}</small>
+      </h2>
+      <hr>
+
+      <strong>Item Description</strong>
+      <br>
+      <p>{{item.description}}</p>
+
+      <br>
+      <div class="form-inline">
+      <input type="text" class="form-control" ng-model="quantity" placeholder="Quantity">
+      <button class="btn btn-warning form-control" ng-click="addToCart();"><span class="glyphicon glyphicon-shopping-cart"></span>&nbsp;Add to Cart</button>
+      </div>
+      
+    </div>
+  
+  </div>
+  
+
+</section>

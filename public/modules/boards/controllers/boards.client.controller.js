@@ -1,8 +1,8 @@
 'use strict';
 
 // Boards controller
-angular.module('boards').controller('BoardsController', ['$scope', '$stateParams', '$location', 'Authentication', 'Boards', '$http',
-  function($scope, $stateParams, $location, Authentication, Boards, $http) {
+angular.module('boards').controller('BoardsController', ['$scope', '$stateParams', '$location', 'Authentication', 'Boards', '$http', '$window',
+  function($scope, $stateParams, $location, Authentication, Boards, $http, $window) {
     $scope.authentication = Authentication;
 
     $scope.options = [];
@@ -39,6 +39,59 @@ angular.module('boards').controller('BoardsController', ['$scope', '$stateParams
         $scope.error = response.message;
       });
     };
+
+
+    $scope.createBoard = function() {
+      // Create new Board object
+      var board = new Boards ({
+        id: $scope.authentication.user._id,
+        message: this.message
+      });
+
+      // Redirect after save
+      board.$save(function(response) {        
+        $window.location.reload();
+        // Clear form fields
+        $scope.message = '';
+      }, function(errorResponse) {
+        $scope.error = errorResponse.data.message;
+      });
+
+    };
+
+    // Remove existing Board
+    $scope.removeBoard = function(boardId) {
+      $http.delete('/boards/' + boardId).success(function(response) {
+        $window.location.reload();
+      }).error(function(err) {
+        alert(err);
+      });
+    };
+
+    //
+
+    $scope.currentPage = 1;
+    $scope.maxSize = 5;
+
+    $http.get('/boards/count').success(function(response) {
+        $scope.totalItems = response.count;
+    });
+
+    $scope.setPage = function(pageNo) {
+      $scope.currentPage = pageNo;
+    };
+
+    $scope.pageChanged = function() {
+      $scope.loadMessages();
+    };
+
+    $scope.loadMessages = function() {
+      $http.get('/boards/page/' + $scope.currentPage).success(function(response) {
+        $scope.boards = response;
+      });
+    };
+
+    //
 
     // Create new Board
     $scope.create = function() {

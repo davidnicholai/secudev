@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('core').controller('HeaderController', ['$scope', 'Authentication', 'Menus', '$http', '$location',
-  function($scope, Authentication, Menus, $http, $location) {
+angular.module('core').controller('HeaderController', ['$scope', 'Authentication', 'Menus', '$http', '$location', '$window',
+  function($scope, Authentication, Menus, $http, $location, $window) {
     $scope.authentication = Authentication;
     $scope.isCollapsed = false;
     $scope.menu = Menus.getMenu('topbar');
@@ -16,8 +16,9 @@ angular.module('core').controller('HeaderController', ['$scope', 'Authentication
     });
 
     $scope.signout = function() {
-      $http.post('/auth/signout').success(function() {
-        $location.path('/');
+      $http.post('/auth/signout').success(function (response) {
+        $location.path('/signin');
+        $window.location.reload();
       });
     };
   }
