@@ -38,24 +38,28 @@ angular.module('shop').controller('CartController', ['$scope', '$stateParams', '
       $scope.chkOutBtn = 'Contacting Paypal...';
     };
 
-    // Below are methods for confirm-cart.client.view.html
+    // Method below is for confirm-cart.client.controller
 
-    $scope.getTransaction = function () {
+    $scope.executeTransaction = function () {
+      $scope.purchaseStatus = 'Processing your transaction...';
+      
       var queries = $location.search();
-
-      $http.get('/carts/checkout/transaction/' + queries.paymentId).success(function (response) {
-        console.log('SUCCESS' + JSON.stringify(response));
+      $http.post('/carts/checkout/transaction', queries).success(function (response) {
+        $scope.purchaseStatus = 'Purchase successful. Thank you for shopping!';
       }).error(function (response) {
-        console.log('ERROR: ' + JSON.stringify(response));
+        $scope.purchaseStatus = 'Oh no, an error occured! ' + response.message;
       });
     };
 
-    $scope.confirmTransaction = function () {
-      var queries = $location.search();
-      $http.post('/carts/checkout/transaction', queries).success(function (response) {
-        console.log('SUCCESS' + JSON.stringify(response));
+    // Method below is for cancel-cart.client.controller
+
+    $scope.cancelTransaction = function () {
+      $scope.cancelStatus = 'Cancelling your transaction...';
+      
+      $http.post('/carts/checkout/cancel').success(function (response) {
+        $scope.cancelStatus = 'Purchase cancelled. We hope to see you soon!';
       }).error(function (response) {
-        console.log('ERROR: ' + JSON.stringify(response));
+        $scope.cancelStatus = 'Oh no, an error occured! ' + response.message;
       });
     };
 

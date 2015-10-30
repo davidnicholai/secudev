@@ -20,6 +20,10 @@ angular.module('shop').config(['$stateProvider',
       url: '/shop/cart/confirm',
       templateUrl: 'modules/shop/views/confirm-cart.client.view.html'
     }).
+    state('cancelCart', {
+      url: '/shop/cart/cancel',
+      templateUrl: 'modules/shop/views/cancel-cart.client.view.html'
+    }).
     state('viewItem', {
       url: '/shop/:itemID',
       templateUrl: 'modules/shop/views/view-item.client.view.html'
@@ -27,6 +31,10 @@ angular.module('shop').config(['$stateProvider',
     state('addItem', {
       url: '/shop/manage/add',
       templateUrl: 'modules/shop/views/shop-admin-add-item.client.view.html'
+    }).
+    state('viewTransactions', {
+      url: '/shop/manage/transactions',
+      templateUrl: 'modules/shop/views/shop-admin-view-transactions.client.view.html'
     }).
     state('editItem', {
       url: '/shop/manage/edit/:itemID',

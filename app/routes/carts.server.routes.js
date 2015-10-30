@@ -19,6 +19,12 @@ module.exports = function(app) {
 
   app.route('/carts/checkout/transaction')
     .post(users.requiresLogin, carts.executeTransaction);
+
+  app.route('/carts/checkout/cancel')
+    .post(users.requiresLogin, carts.cancelTransaction);
+
+  app.route('/transactions')
+    .get(users.requiresLogin, users.requiresAdmin, carts.getTransactions);
   // Finish by binding the Board middleware
-  // app.param('boardId', boards.boardByID);
+  // app.param('boardId', carts.cartByID);
 };

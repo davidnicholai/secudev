@@ -1,0 +1,26 @@
+<section data-ng-controller="ShopAdminController" ng-init="getTransactions();">
+  <h1>Customer Transactions</h1>
+  <hr>
+  
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th style="width: 20%" class="text-center">Date</th>
+        <th style="width: 20%" class="text-center">User</th>
+        <th style="width: 20%" class="text-center">Items</th>
+        <th style="width: 20%" class="text-center">Total Price</th>
+        <th style="width: 20%" class="text-center">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="transaction in transactions">
+        <td class="text-center" ng-bind="transaction.created | date: 'medium'"></td>
+        <td class="text-center">{{transaction.username}}&nbsp;{{transaction.displayName}}</td>
+        <td class="text-center"><span ng-repeat="order in transaction.order">{{order.quantity}}&nbsp;pcs&nbsp;{{order.itemName}}</span></td>
+        <td class="text-center">${{transaction.totalPrice | number:2}}</td>
+        <td class="text-center" style="text-transform: capitalize; font-weight: bold;" ng-bind="transaction.status"></td>
+      </tr>
+    </tbody>
+  </table>
+
+</section>

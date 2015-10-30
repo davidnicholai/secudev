@@ -28,10 +28,8 @@ angular.module('users').controller('ProfileController', ['$scope', '$location', 
       });
     };
 
-
-
     $scope.searchPost = function() {
-      console.log($scope.search.message);
+      
     };
   }
 ]);

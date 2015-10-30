@@ -11,6 +11,67 @@ var mongoose = require('mongoose'),
     _ = require('lodash'),
     paypal = require('paypal-rest-sdk');
 
+exports.getTransactions = function (req, res) {
+  Transaction.find().lean(true).exec(function (err, transactions) {
+    if (err || !transactions) return res.status(400).send({ message: 'An error occured while retrieving your transaction' });
+    // res.jsonp(transactions);
+
+    var userIds = [];
+    var itemIds = [];
+    for (var i = 0; i < transactions.length; i++) { // Collect id of user of each transaction
+      userIds.push(transactions[i].user);
+      for (var j = 0; j < transactions[i].order.length; j++) {
+        itemIds.push(transactions[i].order[j].item);
+      }
+    }
+
+    User.find( { _id: { $in: userIds } } ).exec(function (err, users) {
+      if (err || !users) return res.status(400).send({ message: 'An error occured while retrieving the users' });
+
+      for (var userIdx = 0; userIdx < users.length; userIdx++) {
+        for (var transIdx = 0; transIdx < transactions.length; transIdx++) {
+          if (users[userIdx]._id.toString() === transactions[transIdx].user.toString()) {
+            console.log('found');
+            transactions[transIdx].username = users[userIdx].username;
+            transactions[transIdx].displayName = users[userIdx].firstName + ' ' + users[userIdx].lastName;
+          }
+        }
+      }
+
+      Item.find( { _id: {$in: itemIds} } ).exec(function (err, items) {
+        for (var itemIdx = 0; itemIdx < items.length; itemIdx++) {
+          for (var transIdx = 0; transIdx < transactions.length; transIdx++) {
+            for (var orderIdx = 0; orderIdx < transactions[transIdx].order.length; orderIdx++) {
+              if (items[itemIdx]._id.toString() === transactions[transIdx].order[orderIdx].item.toString()) {
+                transactions[transIdx].order[orderIdx].itemPrice = items[itemIdx].price;
+                transactions[transIdx].order[orderIdx].itemName = items[itemIdx].name;
+              }
+            }
+          }
+        } // Closing of intense for loop
+
+        res.send(transactions);
+      });
+
+      // res.send(transactions);
+    
+    });
+
+  });
+};
+
+exports.cancelTransaction = function (req, res) {
+  Transaction.findOne( { user: req.user._id }, function (err, transaction) {
+    if (err || !transaction) return res.status(400).send({ message: 'An error occured while retrieving your transaction' });
+
+    transaction.status = 'cancelled';
+    transaction.save(function (err) {
+      if (err) return res.status(400).send({ message: 'An error occured while saving your cancelled transaction' });
+      res.send({ message: 'Successfully cancelled transaction. Hope to see you soon!' });
+    });
+  });
+};
+
 exports.executeTransaction = function (req, res) {
   Transaction.findOne( { paymentId : req.body.paymentId }, function (err, transaction) {
     if (err || !transaction) return res.status(400).send({ message: 'An error occured while retrieving your transaction' });
@@ -22,12 +83,19 @@ exports.executeTransaction = function (req, res) {
     paypal.payment.execute(transaction.paymentId, payer, {}, function (err, response) {
       if (err) return res.status(400).send({ message: 'An error occured while executing your transaction' });
 
-      console.log(JSON.stringify(response));
-      transaction.paid = true;
+      transaction.status = 'paid';
       transaction.save(function (err) {
         if (err) return res.status(400).send({ message: 'An error occured while saving your transaction' });
-        res.send({ message: 'Successfully performed payment' });
-      });
+
+        Cart.findOne( {user: req.user._id }, function (err, cart) {
+          if (err || !cart) return res.status(400).send({ message: 'An error occured while retrieving your cart' });
+          cart.content = [];
+          cart.save(function (err) {
+            if (err) return res.status(400).send({ message: 'An error occured while saving your cart' });
+            res.send({ message: 'Successfully performed payment' });
+          }); // Closing of cart.save()
+        }); // Closing of Cart.findOne()        
+      }); // Closing of transaction.save()
     }); // Closing of paypal.payment.execute()
 
   });
@@ -95,6 +163,8 @@ exports.checkout = function (req, res) {
         paypalPayment.transactions[0].amount.total = totalPrice;
         paypalPayment.redirect_urls.return_url = 'https://104.131.183.220/#!/shop/cart/confirm';
         paypalPayment.redirect_urls.cancel_url = 'https://104.131.183.220/#!/shop/cart';
+        // paypalPayment.redirect_urls.return_url = 'http://localhost:3000/#!/shop/cart/confirm';
+        // paypalPayment.redirect_urls.cancel_url = 'http://localhost:3000/#!/shop/cart/cancel';
         paypalPayment.transactions[0].description = 'Total Price: $' + totalPrice;
         
         paypal.payment.create(paypalPayment, {}, function (err, response) {
@@ -103,13 +173,12 @@ exports.checkout = function (req, res) {
           }
 
           if (response) {
-            console.log('response: ' + JSON.stringify(response));
             var link = response.links;
 
             var transaction = new Transaction();
             transaction.paymentId = response.id;
             transaction.user = cart.user;
-            transaction.paid = false;
+            transaction.status = 'not paid';
             transaction.datePaid = new Date();
 
             for (var i = 0; i < cart.content.length; i++) {
@@ -118,10 +187,7 @@ exports.checkout = function (req, res) {
 
             transaction.save(function (err) {
               if (err) {
-                console.log(err);
-                return res.status(400).send({
-                  message: 'Error while saving transaction'
-                });
+                return res.status(400).send({ message: 'Error while saving transaction' });
               } else {
                 for (var i = 0; i < link.length; i++) {
                   if (link[i].rel === 'approval_url') {

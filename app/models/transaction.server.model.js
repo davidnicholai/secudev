@@ -23,8 +23,8 @@ var TransactionSchema = new Schema({
       trim: true
     }
   }],
-  paid: {
-    type: Boolean,
+  status: {
+    type: String,
     default: false,
   },
   datePaid: {
