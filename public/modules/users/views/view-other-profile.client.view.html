@@ -1,4 +1,4 @@
-<section class="row" data-ng-controller="ProfileController" data-ng-init="loadProfile()">
+<section class="row" data-ng-controller="ProfileController" data-ng-init="loadOtherProfile();">
 	<div class="jumbotron">
 		<h3>{{user.salutation}} {{user.firstName}} {{user.lastName}} ({{user.username}})
 			<small>
@@ -7,5 +7,10 @@
 			</small>
 		</h3>	
 		<h5>{{user.description}}</h5>
+
+    {{postBadge}}<br>
+    {{shopBadge}}<br>
+    {{donationBadge}}<br>
+    {{badgeCollection}}
 	</div>
 </section>

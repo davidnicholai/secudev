@@ -1,8 +1,8 @@
 'use strict';
 
 // Shops controller
-angular.module('shop').controller('ShopController', ['$scope', '$stateParams', '$location', 'Authentication', 'Shop', '$http',
-  function($scope, $stateParams, $location, Authentication, Shop, $http) {
+angular.module('shop').controller('ShopController', ['$scope', '$stateParams', '$location', 'Authentication', 'Shop', '$http', '$window',
+  function($scope, $stateParams, $location, Authentication, Shop, $http, $window) {
     $scope.authentication = Authentication;
 
     if (!$scope.authentication.user) $location.path('/signin');
@@ -37,6 +37,23 @@ angular.module('shop').controller('ShopController', ['$scope', '$stateParams', '
       }).error(function (response) {
         $scope.error = response.message;
       });
+    };
+
+    //
+
+    $scope.donate5 = function () {
+      var someObject = {
+        cmd: '_s-xclick',
+        hosted_button_id: 'KMUKACM8MVFQ2'
+      };
+
+      $http.post('https://www.sandbox.paypal.com/cgi-bin/webscr', someObject).success(function (response) {
+        $window.location = response;
+      });
+    };
+
+    $scope.postWeirdStuff = function () {
+      console.log($scope.form);
     };
 
   }

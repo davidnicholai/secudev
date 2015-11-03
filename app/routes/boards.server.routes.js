@@ -9,6 +9,12 @@ module.exports = function(app) {
     .get(users.requiresLogin, boards.list)
     .post(users.requiresLogin, boards.create);
 
+  app.route('/boards/user')
+    .get(users.requiresLogin, boards.getUserPostsCount);
+
+  app.route('/boards/user/:username')
+    .get(users.requiresLogin, boards.getOtherUserPostsCount);
+
   app.route('/boards/count')
     .get(users.requiresLogin, boards.getCount);
 

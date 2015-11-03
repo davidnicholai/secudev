@@ -12,7 +12,29 @@ angular.module('shop').controller('ShopAdminController', ['$scope', '$stateParam
     $scope.getTransactions = function () {
       $http.get('/transactions').success(function (response) {
         $scope.transactions = response;
-        console.log($scope.transactions);
+
+        for (var i = 0; i < $scope.transactions.length; i++) {
+          $scope.transactions[i].totalPrice = 0;
+          for (var j = 0; j < $scope.transactions[i].order.length; j++) {
+            $scope.transactions[i].totalPrice += $scope.transactions[i].order[j].itemPrice * $scope.transactions[i].order[j].quantity;
+          }
+        }
+      }).error(function (response) {
+        $scope.error = response.message;
+      });
+    };
+
+    $scope.searchTransactions = function () {
+      var searchQueries = {
+        dateTo: $scope.dateTo,
+        dateFrom: $scope.dateFrom
+      };
+
+      $http.post('/transactions', searchQueries).success(function (response) {
+        $scope.transactions = response;
+
+        if ($scope.transactions.length < 1)
+          $scope.error = 'No hits';
 
         for (var i = 0; i < $scope.transactions.length; i++) {
           $scope.transactions[i].totalPrice = 0;

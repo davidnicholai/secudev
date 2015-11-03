@@ -24,7 +24,15 @@ module.exports = function(app) {
     .post(users.requiresLogin, carts.cancelTransaction);
 
   app.route('/transactions')
-    .get(users.requiresLogin, users.requiresAdmin, carts.getTransactions);
+    .get(users.requiresLogin, users.requiresAdmin, carts.getTransactions)
+    .post(users.requiresLogin, users.requiresAdmin, carts.getTransactionsDateRange);
+
+  app.route('/transactions/user')
+    .get(users.requiresLogin, carts.getUserTransactions);
+
+  app.route('/transactions/user/:username')
+    .get(users.requiresLogin, carts.getOtherUserTransactions);
+  
   // Finish by binding the Board middleware
   // app.param('boardId', carts.cartByID);
 };

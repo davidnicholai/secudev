@@ -14,12 +14,5 @@ angular.module('core').controller('HeaderController', ['$scope', 'Authentication
     $scope.$on('$stateChangeSuccess', function() {
       $scope.isCollapsed = false;
     });
-
-    $scope.signout = function() {
-      $http.post('/auth/signout').success(function (response) {
-        $location.path('/signin');
-        $window.location.reload();
-      });
-    };
   }
 ]);

@@ -11,6 +11,43 @@ var mongoose = require('mongoose'),
   sanitizeHTML = require('sanitize-html'),
   fs = require('fs');
 
+exports.getOtherUserPostsCount = function (req, res) {
+  User.findOne({username: req.params.username}, function (errUser, user) {
+    if (errUser) return res.status(400).send({message: 'An error occured while getting your user info'});
+    
+    Board.count({user: user._id}, function (err, count) {
+      if (err) return res.status(400).send({message: 'An error occured while getting your posts count'});
+
+      var badge = 0;
+      if (count >= 3 && count <= 4) {
+        badge = 1;
+      } else if (count >= 5 && count <= 9) {
+        badge = 2;
+      } else if (count >= 10) {
+        badge = 3;
+      }
+      res.send({'postBadge': badge});
+    }); // Closing of Board.count()
+
+  }); // Closing of User.findOne()
+};
+
+exports.getUserPostsCount = function (req, res) {
+  Board.count({user: req.user._id}, function (err, count) {
+    if (err) return res.status(400).send({message: 'An error occured while getting your posts count'});
+
+    var badge = 0;
+    if (count >= 3 && count <= 4) {
+      badge = 1;
+    } else if (count >= 5 && count <= 9) {
+      badge = 2;
+    } else if (count >= 10) {
+      badge = 3;
+    }
+    res.send({'postBadge': badge});
+  });
+};
+
 exports.downloadFile = function(req, res) {
   // In C:\meanjs\secudev-case1\backups\<CSV files>
   // Make sure the 'backups' folder already exists

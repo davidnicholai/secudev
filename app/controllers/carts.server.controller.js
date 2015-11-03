@@ -11,10 +11,130 @@ var mongoose = require('mongoose'),
     _ = require('lodash'),
     paypal = require('paypal-rest-sdk');
 
-exports.getTransactions = function (req, res) {
-  Transaction.find().lean(true).exec(function (err, transactions) {
-    if (err || !transactions) return res.status(400).send({ message: 'An error occured while retrieving your transaction' });
+exports.getOtherUserTransactions = function (req, res) {
+  User.findOne({username: req.params.username}, function (errUser, user) {
+    if (errUser) return res.status(400).send({message: 'An error occured while getting your user info'});
+
+    Transaction.find( {user: user._id, status: 'paid'}, { _id: 0, datePaid: 0, user: 0, paymentId: 0, created: 0, status: 0, __v: 0 }, function (err, transactions) {
+      if (err) return res.status(400).send({ message: 'An error occured while retrieving your transactions' });
+      
+      var itemIds = [];
+      for (var i = 0; i < transactions.length; i++) { // Collect id of user of each transaction
+        for (var j = 0; j < transactions[i].order.length; j++) {
+          itemIds.push(transactions[i].order[j].item);
+        }
+      }
+
+      Item.find( { _id: { $in: itemIds } }, function (errItems, items) {
+        if (errItems) return res.status(400).send({ message: 'An error occured while retrieving items ordered' });
+
+        var totalPrice = 0;
+        var donationTotal = 0;
+        for (var itemIdx = 0; itemIdx < items.length; itemIdx++) {
+          for (var transIdx = 0; transIdx < transactions.length; transIdx++) {
+            for (var orderIdx = 0; orderIdx < transactions[transIdx].order.length; orderIdx++) {
+              if ( (items[itemIdx]._id.toString() === transactions[transIdx].order[orderIdx].item.toString()) &&
+                  items[itemIdx].name.indexOf('Donation') < 1) {
+                // transactions[transIdx].order[orderIdx].itemPrice = items[itemIdx].price;
+                // transactions[transIdx].order[orderIdx].itemName = items[itemIdx].name;
+                totalPrice += items[itemIdx].price * transactions[transIdx].order[orderIdx].quantity;
+              } else if  ( (items[itemIdx]._id.toString() === transactions[transIdx].order[orderIdx].item.toString()) &&
+                  items[itemIdx].name.indexOf('Donation') > 0) {
+                donationTotal += items[itemIdx].price * transactions[transIdx].order[orderIdx].quantity;
+              }
+            }
+          }
+        } // Closing of intense for loop
+
+        var shopBadge = 0,
+          donationBadge = 0;
+        if (totalPrice >= 5 && totalPrice <= 19) {
+          shopBadge = 1;
+        } else if (totalPrice >= 20 && totalPrice <= 99) {
+          shopBadge = 2;
+        } else if (totalPrice >= 100) {
+          shopBadge = 3;
+        }
+
+        if (donationTotal >= 5 && donationTotal <= 19) {
+         donationBadge = 1;
+        } else if (donationTotal >= 20 && donationTotal <= 99) {
+         donationBadge = 2;
+        } else if (donationTotal >= 100) {
+         donationBadge = 3;
+        }
+
+        res.send({'shopBadge': shopBadge, 'donationBadge': donationBadge});
+      });
+    });
+
     // res.jsonp(transactions);
+  });
+};
+
+exports.getUserTransactions = function (req, res) {
+  Transaction.find( {user: req.user._id, status: 'paid'}, { _id: 0, datePaid: 0, user: 0, paymentId: 0, created: 0, status: 0, __v: 0 }, function (err, transactions) {
+    if (err) return res.status(400).send({ message: 'An error occured while retrieving your transactions' });
+    
+    var itemIds = [];
+    for (var i = 0; i < transactions.length; i++) { // Collect id of user of each transaction
+      for (var j = 0; j < transactions[i].order.length; j++) {
+        itemIds.push(transactions[i].order[j].item);
+      }
+    }
+
+    Item.find( { _id: { $in: itemIds } }, function (errItems, items) {
+      if (errItems) return res.status(400).send({ message: 'An error occured while retrieving items ordered' });
+
+      var totalPrice = 0;
+      var donationTotal = 0;
+      for (var itemIdx = 0; itemIdx < items.length; itemIdx++) {
+        for (var transIdx = 0; transIdx < transactions.length; transIdx++) {
+          for (var orderIdx = 0; orderIdx < transactions[transIdx].order.length; orderIdx++) {
+            if ( (items[itemIdx]._id.toString() === transactions[transIdx].order[orderIdx].item.toString()) &&
+                items[itemIdx].name.indexOf('Donation') < 1) {
+              // transactions[transIdx].order[orderIdx].itemPrice = items[itemIdx].price;
+              // transactions[transIdx].order[orderIdx].itemName = items[itemIdx].name;
+              totalPrice += items[itemIdx].price * transactions[transIdx].order[orderIdx].quantity;
+            } else if  ( (items[itemIdx]._id.toString() === transactions[transIdx].order[orderIdx].item.toString()) &&
+                items[itemIdx].name.indexOf('Donation') > 0) {
+              donationTotal += items[itemIdx].price * transactions[transIdx].order[orderIdx].quantity;
+            }
+          }
+        }
+      } // Closing of intense for loop
+
+      var shopBadge = 0,
+        donationBadge = 0;
+      if (totalPrice >= 5 && totalPrice <= 19) {
+        shopBadge = 1;
+      } else if (totalPrice >= 20 && totalPrice <= 99) {
+        shopBadge = 2;
+      } else if (totalPrice >= 100) {
+        shopBadge = 3;
+      }
+
+      if (donationTotal >= 5 && donationTotal <= 19) {
+       donationBadge = 1;
+      } else if (donationTotal >= 20 && donationTotal <= 99) {
+       donationBadge = 2;
+      } else if (donationTotal >= 100) {
+       donationBadge = 3;
+      }
+
+      res.send({'shopBadge': shopBadge, 'donationBadge': donationBadge});
+    });
+
+    // res.jsonp(transactions);
+  });
+};
+
+exports.getTransactionsDateRange = function (req, res) {
+  var newDateTo = req.body.dateTo,
+    newDateFrom = req.body.dateFrom;
+
+  Transaction.find( { created: {$gte: newDateTo, $lte: newDateFrom} } ).lean().exec(function (err, transactions) {
+    if (err || !transactions) return res.status(400).send({ message: 'An error occured while retrieving your transaction' });
 
     var userIds = [];
     var itemIds = [];
@@ -31,7 +151,6 @@ exports.getTransactions = function (req, res) {
       for (var userIdx = 0; userIdx < users.length; userIdx++) {
         for (var transIdx = 0; transIdx < transactions.length; transIdx++) {
           if (users[userIdx]._id.toString() === transactions[transIdx].user.toString()) {
-            console.log('found');
             transactions[transIdx].username = users[userIdx].username;
             transactions[transIdx].displayName = users[userIdx].firstName + ' ' + users[userIdx].lastName;
           }
@@ -52,8 +171,51 @@ exports.getTransactions = function (req, res) {
 
         res.send(transactions);
       });
+    
+    });
 
-      // res.send(transactions);
+  });
+};
+
+exports.getTransactions = function (req, res) {
+  Transaction.find().lean().exec(function (err, transactions) {
+    if (err || !transactions) return res.status(400).send({ message: 'An error occured while retrieving your transaction' });
+
+    var userIds = [];
+    var itemIds = [];
+    for (var i = 0; i < transactions.length; i++) { // Collect id of user of each transaction
+      userIds.push(transactions[i].user);
+      for (var j = 0; j < transactions[i].order.length; j++) {
+        itemIds.push(transactions[i].order[j].item);
+      }
+    }
+
+    User.find( { _id: { $in: userIds } } ).exec(function (err, users) {
+      if (err || !users) return res.status(400).send({ message: 'An error occured while retrieving the users' });
+
+      for (var userIdx = 0; userIdx < users.length; userIdx++) {
+        for (var transIdx = 0; transIdx < transactions.length; transIdx++) {
+          if (users[userIdx]._id.toString() === transactions[transIdx].user.toString()) {
+            transactions[transIdx].username = users[userIdx].username;
+            transactions[transIdx].displayName = users[userIdx].firstName + ' ' + users[userIdx].lastName;
+          }
+        }
+      }
+
+      Item.find( { _id: {$in: itemIds} } ).exec(function (err, items) {
+        for (var itemIdx = 0; itemIdx < items.length; itemIdx++) {
+          for (var transIdx = 0; transIdx < transactions.length; transIdx++) {
+            for (var orderIdx = 0; orderIdx < transactions[transIdx].order.length; orderIdx++) {
+              if (items[itemIdx]._id.toString() === transactions[transIdx].order[orderIdx].item.toString()) {
+                transactions[transIdx].order[orderIdx].itemPrice = items[itemIdx].price;
+                transactions[transIdx].order[orderIdx].itemName = items[itemIdx].name;
+              }
+            }
+          }
+        } // Closing of intense for loop
+
+        res.send(transactions);
+      });
     
     });
 
