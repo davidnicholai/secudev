@@ -26,7 +26,7 @@ exports.processQuickDonate = function (req, res) {
           if (errUser) console.log('USER ERROR: ' + errUser);
           else {
             var transaction = new Transaction();
-            transaction.isQuickDonate = true;
+            transaction.isQuickDonation = true;
             transaction.status = 'Paid';
             transaction.user = user._id;
             transaction.totalPrice = req.body.payment_gross;
@@ -72,6 +72,10 @@ exports.getOtherUserTransactions = function (req, res) {
                   items[itemIdx].name.indexOf('Donation') > 0) {
                 donationTotal += items[itemIdx].price * transactions[transIdx].order[orderIdx].quantity;
               }
+            }
+          
+            if (transactions[transIdx].isQuickDonation === true) {
+              donationTotal += transactions[transIdx].totalPrice;
             }
           }
         } // Closing of intense for loop
@@ -130,6 +134,10 @@ exports.getUserTransactions = function (req, res) {
                 items[itemIdx].name.indexOf('Donation') > 0) {
               donationTotal += items[itemIdx].price * transactions[transIdx].order[orderIdx].quantity;
             }
+          }
+          
+          if (transactions[transIdx].isQuickDonation === true) {
+            donationTotal += transactions[transIdx].totalPrice;
           }
         }
       } // Closing of intense for loop
