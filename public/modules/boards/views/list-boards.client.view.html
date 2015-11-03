@@ -1,7 +1,7 @@
 <section data-ng-controller="BoardsController" data-ng-init="loadMessages()">
   <h2>Message Boards</h2>
   <hr>
-  <form data-ng-submit="createBoard()" novalidate>
+  <form ng-submit="createBoard()" novalidate>
     <fieldset>
       <div class="form-group">
         <div class="controls">
@@ -9,7 +9,7 @@
         </div>
       </div>
       <div class="form-group">
-        <input type="submit" class="btn btn-success">
+        <input type="submit" class="btn btn-success" ng-disabled="cannotPost">
         <a href="/#!/boards/search" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span></a>
       </div>
       <div data-ng-show="error" class="text-danger">

@@ -6,6 +6,7 @@ angular.module('shop').controller('ShopAdminEditItemController', ['$scope', '$st
     $scope.authentication = Authentication;
 
     $scope.isNotReady = true;
+    $scope.cannotDelete = false;
 
     if ($scope.authentication.user.roles !== 'admin') {
       $location.path('/#!/profile');
@@ -38,6 +39,7 @@ angular.module('shop').controller('ShopAdminEditItemController', ['$scope', '$st
     };
 
     $scope.delete = function () {
+      $scope.cannotDelete = true;
       $http.delete('/items/' + $stateParams.itemID).success(function (response) {
         $scope.error = 'Successfully deleted this item';
         $location.path('/shop');

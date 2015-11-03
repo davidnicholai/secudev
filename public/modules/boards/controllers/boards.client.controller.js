@@ -42,6 +42,7 @@ angular.module('boards').controller('BoardsController', ['$scope', '$stateParams
 
 
     $scope.createBoard = function() {
+      $scope.cannotPost = true;
       // Create new Board object
       var board = new Boards ({
         id: $scope.authentication.user._id,
@@ -49,12 +50,13 @@ angular.module('boards').controller('BoardsController', ['$scope', '$stateParams
       });
 
       // Redirect after save
-      board.$save(function(response) {        
+      board.$save(function(response) {
         $window.location.reload();
         // Clear form fields
         $scope.message = '';
       }, function(errorResponse) {
         $scope.error = errorResponse.data.message;
+        $scope.cannotPost = false;
       });
 
     };

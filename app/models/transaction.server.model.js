@@ -12,6 +12,11 @@ var TransactionSchema = new Schema({
     type: String,
     trim: true,
   },
+  totalPrice: {
+    type: Number,
+    default: 0,
+    trim: true
+  },
   order: [{
     item: {
       type: Schema.ObjectId,

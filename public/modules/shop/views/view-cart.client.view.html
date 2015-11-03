@@ -51,8 +51,8 @@
       </tbody>
     </table>
 
-    <form action="/carts/checkout" method="GET">
-      <button type="submit" class="btn btn-warning btn-lg btn-block" ng-disabled="cannotCheckout">{{chkOutBtn}}</button>
-    </form>
+    <!-- <form action="/carts/checkout" method="GET"> -->
+      <button ng-click="checkout();" class="btn btn-warning btn-lg btn-block" ng-disabled="cannotCheckout">{{chkOutBtn}}</button>
+    <!-- </form> -->
   </div>
 </section>

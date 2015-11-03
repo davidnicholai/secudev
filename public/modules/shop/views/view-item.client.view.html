@@ -14,7 +14,7 @@
 
     <div class="col-md-8">
       <h2>
-        <a href="#!/shop/manage/edit/{{item._id}}" class="btn btn-primary" ng-show="isAdmin">
+        <a href="#!/shop/manage/edit/{{item._id}}" class="btn btn-primary" ng-show="isAdmin && item">
           <span class="glyphicon glyphicon-pencil"></span>
         </a>
         {{item.name}}
@@ -29,7 +29,7 @@
       <br>
       <div class="form-inline">
       <input type="text" class="form-control" ng-model="quantity" placeholder="Quantity">
-      <button class="btn btn-warning form-control" ng-click="addToCart();"><span class="glyphicon glyphicon-shopping-cart"></span>&nbsp;Add to Cart</button>
+      <button class="btn btn-warning form-control" ng-click="addToCart();" ng-disabled="cannotAdd"><span class="glyphicon glyphicon-shopping-cart"></span>&nbsp;Add to Cart</button>
       </div>
       
     </div>

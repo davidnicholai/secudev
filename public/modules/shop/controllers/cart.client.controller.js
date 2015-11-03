@@ -36,6 +36,11 @@ angular.module('shop').controller('CartController', ['$scope', '$stateParams', '
     $scope.checkout = function () {
       $scope.cannotCheckout = true;
       $scope.chkOutBtn = 'Contacting Paypal...';
+
+      $http.get('/carts/checkout').success(function (response) {
+        $scope.chkOutBtn = 'Success! Redirecting...';
+        $window.location = response;
+      });
     };
 
     // Method below is for confirm-cart.client.controller

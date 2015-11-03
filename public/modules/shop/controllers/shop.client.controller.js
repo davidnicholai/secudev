@@ -17,14 +17,17 @@ angular.module('shop').controller('ShopController', ['$scope', '$stateParams', '
     };
 
     $scope.findItem = function () {
+      $scope.cannotAdd = true;
       $http.get('/items/' + $stateParams.itemID).success(function (response) {
         $scope.item = response;
+        $scope.cannotAdd = false;
       });
     };
 
     $scope.addToCart = function () {
       $scope.success = null;
       $scope.error = null;
+      $scope.cannotAdd = true;
 
       var order = {
         item: $scope.item,

@@ -323,10 +323,10 @@ exports.checkout = function (req, res) {
         };
 
         paypalPayment.transactions[0].amount.total = totalPrice;
-        paypalPayment.redirect_urls.return_url = 'https://104.131.183.220/#!/shop/cart/confirm';
-        paypalPayment.redirect_urls.cancel_url = 'https://104.131.183.220/#!/shop/cart';
-        // paypalPayment.redirect_urls.return_url = 'http://localhost:3000/#!/shop/cart/confirm';
-        // paypalPayment.redirect_urls.cancel_url = 'http://localhost:3000/#!/shop/cart/cancel';
+        // paypalPayment.redirect_urls.return_url = 'https://104.131.183.220/#!/shop/cart/confirm';
+        // paypalPayment.redirect_urls.cancel_url = 'https://104.131.183.220/#!/shop/cart';
+        paypalPayment.redirect_urls.return_url = 'http://localhost:3000/#!/shop/cart/confirm';
+        paypalPayment.redirect_urls.cancel_url = 'http://localhost:3000/#!/shop/cart/cancel';
         paypalPayment.transactions[0].description = 'Total Price: $' + totalPrice;
         
         paypal.payment.create(paypalPayment, {}, function (err, response) {
@@ -339,6 +339,7 @@ exports.checkout = function (req, res) {
 
             var transaction = new Transaction();
             transaction.paymentId = response.id;
+            transaction.totalPrice = totalPrice;
             transaction.user = cart.user;
             transaction.status = 'not paid';
             transaction.datePaid = new Date();
@@ -353,7 +354,8 @@ exports.checkout = function (req, res) {
               } else {
                 for (var i = 0; i < link.length; i++) {
                   if (link[i].rel === 'approval_url') {
-                    res.redirect(link[i].href);
+                    // res.redirect(link[i].href);
+                    res.send(link[i].href);
                   }
                 }
               }
