@@ -361,10 +361,10 @@ exports.checkout = function (req, res) {
         };
 
         paypalPayment.transactions[0].amount.total = totalPrice;
-        // paypalPayment.redirect_urls.return_url = 'https://104.131.183.220/#!/shop/cart/confirm';
-        // paypalPayment.redirect_urls.cancel_url = 'https://104.131.183.220/#!/shop/cart';
-        paypalPayment.redirect_urls.return_url = 'http://localhost:3000/#!/shop/cart/confirm';
-        paypalPayment.redirect_urls.cancel_url = 'http://localhost:3000/#!/shop/cart/cancel';
+        paypalPayment.redirect_urls.return_url = 'https://104.131.183.220/#!/shop/cart/confirm';
+        paypalPayment.redirect_urls.cancel_url = 'https://104.131.183.220/#!/shop/cart';
+        // paypalPayment.redirect_urls.return_url = 'http://localhost:3000/#!/shop/cart/confirm';
+        // paypalPayment.redirect_urls.cancel_url = 'http://localhost:3000/#!/shop/cart/cancel';
         paypalPayment.transactions[0].description = 'Total Price: $' + totalPrice;
         
         paypal.payment.create(paypalPayment, {}, function (err, response) {
