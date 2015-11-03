@@ -23,7 +23,7 @@
       <tr ng-repeat="transaction in transactions">
         <td class="text-center" ng-bind="transaction.created | date: 'medium'"></td>
         <td class="text-center"><a href="#!/profile/{{transaction.username}}">{{transaction.username}}&nbsp;{{transaction.displayName}}</a></td>
-        <td class="text-center"><span ng-repeat="order in transaction.order">{{order.quantity}}&nbsp;pcs&nbsp;{{order.itemName}}<br></span></td>
+        <td class="text-center"><span ng-show="transaction.order.length < 1">Donation</span><span ng-repeat="order in transaction.order">{{order.quantity}}&nbsp;pcs&nbsp;{{order.itemName}}<br></span></td>
         <td class="text-center">${{transaction.totalPrice | number:2}}</td>
         <td class="text-center" style="text-transform: capitalize; font-weight: bold;" ng-bind="transaction.status"></td>
       </tr>

@@ -8,6 +8,10 @@ var TransactionSchema = new Schema({
     type: Schema.ObjectId,
     ref: 'User'
   },
+  isQuickDonation: {
+    type: Boolean,
+    default: false
+  },
   paymentId: {
     type: String,
     trim: true,

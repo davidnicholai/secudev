@@ -9,7 +9,37 @@ var mongoose = require('mongoose'),
     Item = mongoose.model('Item'),
     Transaction = mongoose.model('Transaction'),
     _ = require('lodash'),
-    paypal = require('paypal-rest-sdk');
+    paypal = require('paypal-rest-sdk'),
+    ipn = require('paypal-ipn');
+
+exports.processQuickDonate = function (req, res) {
+  res.sendStatus(200);
+  
+  // console.log('LOG:' + JSON.parse(req.body));
+  ipn.verify(req.body, {'allow_sandbox': true}, function (err, msg) {
+    if (err) console.log('IPN ERROR: ' + err);
+    else {
+      if (req.body.payment_status === 'Completed') {
+        console.log('Hurray! He completed his payment_status.');
+
+        User.findOne( {_id: req.body.transaction_subject}, function (errUser, user) {
+          if (errUser) console.log('USER ERROR: ' + errUser);
+          else {
+            var transaction = new Transaction();
+            transaction.isQuickDonate = true;
+            transaction.status = 'Paid';
+            transaction.user = user._id;
+            transaction.totalPrice = req.body.payment_gross;
+            transaction.save(function (errTransaction) {
+              if (errTransaction) console.log('TRANSACTION ERROR: ' + errTransaction);
+              else console.log('Successfully saved donation!');
+            });
+          }
+        }); // Closing of User.findOne()
+      } // Closing if (req.body.payment_status === 'Completed')
+    } // Closing of else
+  }); // CLosing of ipn.verify()
+};
 
 exports.getOtherUserTransactions = function (req, res) {
   User.findOne({username: req.params.username}, function (errUser, user) {

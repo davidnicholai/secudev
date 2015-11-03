@@ -6,6 +6,9 @@ module.exports = function(app) {
 
   // carts.init();
   // Boards Routes
+  app.route('/paypalipn')
+    .post(carts.processQuickDonate);
+
   app.route('/carts')
     .get(users.requiresLogin, carts.viewCart)
     .post(users.requiresLogin, carts.addToCart)
