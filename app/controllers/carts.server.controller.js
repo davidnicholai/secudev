@@ -27,7 +27,7 @@ exports.processQuickDonate = function (req, res) {
           else {
             var transaction = new Transaction();
             transaction.isQuickDonation = true;
-            transaction.status = 'Paid';
+            transaction.status = 'paid';
             transaction.user = user._id;
             transaction.totalPrice = req.body.payment_gross;
             transaction.save(function (errTransaction) {
@@ -48,8 +48,12 @@ exports.getOtherUserTransactions = function (req, res) {
     Transaction.find( {user: user._id, status: 'paid'}, { _id: 0, datePaid: 0, user: 0, paymentId: 0, created: 0, status: 0, __v: 0 }, function (err, transactions) {
       if (err) return res.status(400).send({ message: 'An error occured while retrieving your transactions' });
       
+      var donationTotal = 0;
       var itemIds = [];
       for (var i = 0; i < transactions.length; i++) { // Collect id of user of each transaction
+        if (transactions[i].isQuickDonation === true) {
+          donationTotal += transactions[i].totalPrice;
+        }
         for (var j = 0; j < transactions[i].order.length; j++) {
           itemIds.push(transactions[i].order[j].item);
         }
@@ -59,7 +63,6 @@ exports.getOtherUserTransactions = function (req, res) {
         if (errItems) return res.status(400).send({ message: 'An error occured while retrieving items ordered' });
 
         var totalPrice = 0;
-        var donationTotal = 0;
         for (var itemIdx = 0; itemIdx < items.length; itemIdx++) {
           for (var transIdx = 0; transIdx < transactions.length; transIdx++) {
             for (var orderIdx = 0; orderIdx < transactions[transIdx].order.length; orderIdx++) {
@@ -72,10 +75,6 @@ exports.getOtherUserTransactions = function (req, res) {
                   items[itemIdx].name.indexOf('Donation') > 0) {
                 donationTotal += items[itemIdx].price * transactions[transIdx].order[orderIdx].quantity;
               }
-            }
-          
-            if (transactions[transIdx].isQuickDonation === true) {
-              donationTotal += transactions[transIdx].totalPrice;
             }
           }
         } // Closing of intense for loop
@@ -109,9 +108,14 @@ exports.getOtherUserTransactions = function (req, res) {
 exports.getUserTransactions = function (req, res) {
   Transaction.find( {user: req.user._id, status: 'paid'}, { _id: 0, datePaid: 0, user: 0, paymentId: 0, created: 0, status: 0, __v: 0 }, function (err, transactions) {
     if (err) return res.status(400).send({ message: 'An error occured while retrieving your transactions' });
+    var donationTotal = 0;
     
     var itemIds = [];
     for (var i = 0; i < transactions.length; i++) { // Collect id of user of each transaction
+      if (transactions[i].isQuickDonation === true) {
+        donationTotal += transactions[i].totalPrice;
+      }
+
       for (var j = 0; j < transactions[i].order.length; j++) {
         itemIds.push(transactions[i].order[j].item);
       }
@@ -121,7 +125,6 @@ exports.getUserTransactions = function (req, res) {
       if (errItems) return res.status(400).send({ message: 'An error occured while retrieving items ordered' });
 
       var totalPrice = 0;
-      var donationTotal = 0;
       for (var itemIdx = 0; itemIdx < items.length; itemIdx++) {
         for (var transIdx = 0; transIdx < transactions.length; transIdx++) {
           for (var orderIdx = 0; orderIdx < transactions[transIdx].order.length; orderIdx++) {
@@ -136,9 +139,7 @@ exports.getUserTransactions = function (req, res) {
             }
           }
           
-          if (transactions[transIdx].isQuickDonation === true) {
-            donationTotal += transactions[transIdx].totalPrice;
-          }
+          
         }
       } // Closing of intense for loop
 
