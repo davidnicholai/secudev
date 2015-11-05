@@ -62,6 +62,12 @@ exports.create = function(req, res) {
  */
 exports.read = function(req, res) {
   res.jsonp(req.item);
+  // console.log(req.item);
+  // Item.findOne({_id: req.params.itemId}, function (errItem, item) {
+  //   if (errItem) return res.status(400).send({ message: 'An error occured while attempting to retrieve this item' });
+  //   else if (!item) return res.status(400).send({ message: 'Sorry, this item doesn\'t exist in our database' });
+  //   else res.jsonp(item);
+  // });
 };
 
 /**
@@ -121,8 +127,8 @@ exports.list = function(req, res) {
 exports.itemByID = function(req, res, next, id) { 
   Item.findById(id).exec(function(err, item) {
     if (err) return next(err);
-    if (! item) return next(new Error('Failed to load Item ' + id));
-    req.item = item ;
+    if (!item) return res.status(400).send( {message: 'Sorry, this item doesn\'t exist in our database'} );
+    req.item = item;
     next();
   });
 };

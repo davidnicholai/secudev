@@ -12,13 +12,13 @@ angular.module('shop').controller('ShopAdminController', ['$scope', '$stateParam
     $scope.getTransactions = function () {
       $http.get('/transactions').success(function (response) {
         $scope.transactions = response;
-/*
+
         for (var i = 0; i < $scope.transactions.length; i++) {
-          $scope.transactions[i].totalPrice = 0;
           for (var j = 0; j < $scope.transactions[i].order.length; j++) {
-            $scope.transactions[i].totalPrice += $scope.transactions[i].order[j].itemPrice * $scope.transactions[i].order[j].quantity;
+            if (!$scope.transactions[i].order[j].itemName)
+              $scope.transactions[i].order[j].itemName = '[deleted item]';
           } 
-        }*/
+        }
       }).error(function (response) {
         $scope.error = response.message;
       });

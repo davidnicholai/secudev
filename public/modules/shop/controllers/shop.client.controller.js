@@ -5,7 +5,8 @@ angular.module('shop').controller('ShopController', ['$scope', '$stateParams', '
   function($scope, $stateParams, $location, Authentication, Shop, $http, $window) {
     $scope.authentication = Authentication;
 
-    if (!$scope.authentication.user) $location.path('/signin');
+    if (!$scope.authentication.user)
+      $location.path('/signin');
 
     if ($scope.authentication.user.roles === 'admin')
       $scope.isAdmin = true;
@@ -18,9 +19,15 @@ angular.module('shop').controller('ShopController', ['$scope', '$stateParams', '
 
     $scope.findItem = function () {
       $scope.cannotAdd = true;
+      $scope.findSuccess = null;
+      $scope.findError = null;
       $http.get('/items/' + $stateParams.itemID).success(function (response) {
         $scope.item = response;
         $scope.cannotAdd = false;
+        $scope.findSuccess = true;
+        $scope.findError = null;
+      }).error(function (response) {
+        $scope.findError = response.message;
       });
     };
 

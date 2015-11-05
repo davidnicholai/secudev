@@ -13,7 +13,7 @@ module.exports = function(app) {
     .post(users.requiresLogin, items.create);
 
   app.route('/items/:itemId')
-    .get(items.read)
+    .get(users.requiresLogin, items.read)
     .put(users.requiresLogin, users.requiresAdmin, items.update)
     .delete(users.requiresLogin, users.requiresAdmin, items.delete);
 

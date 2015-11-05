@@ -5,7 +5,7 @@ angular.module('shop').controller('ShopAdminEditItemController', ['$scope', '$st
   function($scope, $stateParams, $timeout, $window, Authentication, FileUploader, $location, $http) {
     $scope.authentication = Authentication;
 
-    $scope.isNotReady = true;
+    $scope.isNotReady = false;
     $scope.cannotDelete = false;
 
     if ($scope.authentication.user.roles !== 'admin') {

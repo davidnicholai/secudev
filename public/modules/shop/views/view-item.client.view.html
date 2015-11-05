@@ -1,7 +1,13 @@
 <section ng-controller="ShopController" ng-init="findItem();">
   <br><br>
 
-  <div class="row">
+  <div class="row" ng-show="findError">
+    <div class="col-md-12 alert alert-danger text-center" role="alert">
+      <span ng-bind="findError"></span>
+    </div>
+  </div>
+
+  <div class="row" ng-show="findSuccess">
     <div class="col-md-12 alert alert-success text-center" role="alert" ng-show="success">
       <span ng-bind="success"></span>
     </div>
