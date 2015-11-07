@@ -20,6 +20,39 @@ var db = mongoose.connect(config.db, function(err) {
 	}
 });
 
+// Prepare folders
+if (!fs.existsSync('backups')) {
+  fs.mkdirSync('backups', function(err) {
+    if (err) {
+      console.error(chalk.red('Error occured while creating backups folder. ' + err));
+    }
+  });
+}
+
+if (!fs.existsSync('public/static')) {
+  fs.mkdirSync('public/static', function(err) {
+    if (err) {
+      console.error(chalk.red('Error occured while creating public/static folder. ' + err));
+    } else {
+      if (!fs.existsSync('public/static/images')) {
+        fs.mkdirSync('public/static/images', function(err) {
+          if (err) {
+            console.error(chalk.red('Error occured while creating public/static/images folder. ' + err));
+          }
+        });
+      }      
+    }
+  });
+}
+
+if (!fs.existsSync('public/static/images')) {
+  fs.mkdirSync('public/static/images', function(err) {
+    if (err) {
+      console.error(chalk.red('Error occured while creating public/static/images folder. ' + err));
+    }
+  });
+}
+
 // Init the express application
 var app = require('./config/express')(db);
 
