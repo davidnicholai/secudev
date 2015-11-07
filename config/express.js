@@ -146,6 +146,13 @@ module.exports = function(db) {
   });
 
   if (process.env.NODE_ENV === 'secure') {
+    app.use(function(req, res, next) {
+      if (!req.secure) {
+        return res.redirect(['https://', req.get('Host'), req.url].join(''));
+      }
+      next();
+    });
+
     // Log SSL usage
     console.log('Securely using https protocol');
 
