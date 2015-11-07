@@ -46,12 +46,6 @@ module.exports = function(db) {
     res.locals.url = req.protocol + '://' + req.headers.host + req.url;
     next();
   });
-  app.use(function(req, res, next) {
-    if (!req.secure) {
-      return res.redirect(['https://', req.get('Host'), req.url].join(''));
-    }
-    next();
-  });
 
   // Should be placed before express.static
   app.use(compress({
@@ -152,7 +146,6 @@ module.exports = function(db) {
   });
 
   if (process.env.NODE_ENV === 'secure') {
-
     // Log SSL usage
     console.log('Securely using https protocol');
 
