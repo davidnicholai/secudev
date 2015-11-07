@@ -40,17 +40,16 @@ module.exports = function(db) {
   app.locals.facebookAppId = config.facebook.clientID;
   app.locals.jsFiles = config.getJavaScriptAssets();
   app.locals.cssFiles = config.getCSSAssets();
-  
-  app.use(function(req, res, next) {
-    if (!req.secure) {
-      return res.redirect(['https://', req.get('Host'), req.url].join(''));
-    }
-    next();
-  });
 
   // Passing the request url to environment locals
   app.use(function(req, res, next) {
     res.locals.url = req.protocol + '://' + req.headers.host + req.url;
+    next();
+  });
+  app.use(function(req, res, next) {
+    if (!req.secure) {
+      return res.redirect(['https://', req.get('Host'), req.url].join(''));
+    }
     next();
   });
 
