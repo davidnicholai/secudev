@@ -40,6 +40,13 @@ module.exports = function(db) {
   app.locals.facebookAppId = config.facebook.clientID;
   app.locals.jsFiles = config.getJavaScriptAssets();
   app.locals.cssFiles = config.getCSSAssets();
+  
+  app.use(function(req, res, next) {
+    if (!req.secure) {
+      return res.redirect(['https://', req.get('Host'), req.url].join(''));
+    }
+    next();
+  });
 
   // Passing the request url to environment locals
   app.use(function(req, res, next) {
@@ -146,12 +153,6 @@ module.exports = function(db) {
   });
 
   if (process.env.NODE_ENV === 'secure') {
-    app.use(function(req, res, next) {
-      if (!req.secure) {
-        return res.redirect(['https://', req.get('Host'), req.url].join(''));
-      }
-      next();
-    });
 
     // Log SSL usage
     console.log('Securely using https protocol');
