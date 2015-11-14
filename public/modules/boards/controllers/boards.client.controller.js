@@ -54,6 +54,7 @@ angular.module('boards').controller('BoardsController', ['$scope', '$stateParams
         $window.location.reload();
         // Clear form fields
         $scope.message = '';
+        $scope.cannotPost = false;
       }, function(errorResponse) {
         $scope.error = errorResponse.data.message;
         $scope.cannotPost = false;

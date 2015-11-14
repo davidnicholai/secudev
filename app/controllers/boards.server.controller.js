@@ -293,6 +293,12 @@ exports.create = function(req, res) {
     });
   }
 
+  if (!req.body.message || req.body.message.length < 1) {
+    return res.status(400).send({
+      message: 'Your message is not valid.'
+    });    
+  }
+
   var cleanMessage = sanitizeHTML(req.body.message, {
     allowedTags: [ 'b', 'i', 'em', 'strong', 'a', 'img' ],
     allowedAttributes: {

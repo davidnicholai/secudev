@@ -43,27 +43,12 @@ angular.module('shop').controller('ShopController', ['$scope', '$stateParams', '
 
       $http.post('/carts', order).success(function (response) {
         $scope.success = response.message;
+        $scope.cannotAdd = false;
         $location.path('/shop/cart');
       }).error(function (response) {
         $scope.error = response.message;
+        $scope.cannotAdd = false;
       });
-    };
-
-    //
-
-    $scope.donate5 = function () {
-      var someObject = {
-        cmd: '_s-xclick',
-        hosted_button_id: 'KMUKACM8MVFQ2'
-      };
-
-      $http.post('https://www.sandbox.paypal.com/cgi-bin/webscr', someObject).success(function (response) {
-        $window.location = response;
-      });
-    };
-
-    $scope.postWeirdStuff = function () {
-      console.log($scope.form);
     };
 
   }

@@ -440,7 +440,13 @@ exports.removeFromCart = function (req, res) {
 
 exports.addToCart = function (req, res) {
 
-  if (req.body.quantity < 0 || req.body.quantity.match(/[0-9]+/) === null || req.body.quantity % 1 !== 0) {
+  if (req.body.quantity) {
+    if (req.body.quantity < 0 || req.body.quantity.match(/[0-9]+/) === null || req.body.quantity % 1 !== 0) {
+      return res.status(400).send({
+        message: 'Please input a valid quantity'
+      });
+    }
+  } else {
     return res.status(400).send({
       message: 'Please input a valid quantity'
     });
