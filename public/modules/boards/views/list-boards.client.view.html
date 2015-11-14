@@ -24,7 +24,7 @@
   </div>
 
   <div class="list-group">
-    <a data-ng-repeat="board in boards" data-ng-href="#!/boards/{{board._id}}" class="list-group-item">
+    <ul data-ng-repeat="board in boards" data-ng-href="#!/boards/{{board._id}}" class="list-group-item">
       <table>
         <tr>
           <td valign="top" class="right-margin">
@@ -38,6 +38,17 @@
             <i><small>Created: {{board.created | date: 'MMM dd, yyyy h:mm a'}}</small></i>
             <br><br>
             <span data-ng-bind-html="board.message"></span>
+
+            <div ng-show="board.attachedItems.length">
+              <h5>Attached Items: </h5>
+              <ul class="list-group" style="margin-bottom: 0">
+                <li class="list-group-item" ng-repeat="item in board.attachedItems">
+                  <img class="cart-thumbnail" ng-src="/static/images/{{item.image}}" alt="{{item.name}}"/>
+                  <a href="#!/shop/{{item._id}}"><span ng-bind="item.name"></span></a>
+                </li>
+              </ul>
+            </div>
+
             <span data-ng-show="board.updated !== board.created">
               <hr>
               <i><small>Updated: {{board.updated | date: 'MMM dd, yyyy h:mm a'}}</small></i>
@@ -51,6 +62,6 @@
           </td>
         </tr>
       </table>
-    </a>
+    </ul>
   </div>
 </section>

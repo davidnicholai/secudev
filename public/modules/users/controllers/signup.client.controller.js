@@ -12,15 +12,18 @@ angular.module('users').controller('SignupController', ['$scope', '$http', '$loc
 			}
 		}
 
-		$scope.signup = function() {			
+		$scope.signup = function() {
+      $scope.cannotSignup = true;
 			$http.post('/auth/signup', $scope.credentials).success(function(response) {
 				// If successful we assign the response to the global user model
 				$scope.authentication.user = response;
+        $scope.cannotSignup = false;
 
 				// And redirect to the index page
 				$location.path('/');
 			}).error(function(response) {
 				$scope.error = response.message;
+        $scope.cannotSignup = false;
 			});
 		};
 
@@ -37,7 +40,6 @@ angular.module('users').controller('SignupController', ['$scope', '$http', '$loc
 				$scope.hasGender = true;
 			}
 		};
-
 
 	}
 ]);

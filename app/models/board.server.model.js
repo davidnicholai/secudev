@@ -17,6 +17,14 @@ var BoardSchema = new Schema({
     required: 'Please fill Board message',
     trim: true
   },
+  attachedItems: [
+    {
+      item: {
+        type: Schema.ObjectId,
+        ref: 'Item'
+      }
+    }
+  ],
   created: {
     type: Date,
     default: Date.now

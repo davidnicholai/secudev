@@ -7,6 +7,7 @@ var mongoose = require('mongoose'),
   errorHandler = require('./errors.server.controller'),
   Board = mongoose.model('Board'),
   User = mongoose.model('User'),
+  Item = mongoose.model('Item'),
   _ = require('lodash'),
   sanitizeHTML = require('sanitize-html'),
   fs = require('fs');
@@ -250,12 +251,35 @@ exports.limitedList = function(req, res) {
   Board.find({ $query: {}, $orderby: {updated: -1} }).skip((page - 1) * per_page).limit(per_page)
     .populate('user', 'firstName lastName created username')
     .exec(function (err, boards) {
-      if (err)
+      if (err) {
         return res.status(400).send({
           message:errorHandler.getErrorMessage(err)
         });
-      else
-        res.json(boards);     
+      } else {
+        var itemIds = [];
+        for (var i = 0; i < boards.length; i++)
+          for (var j = 0; j < boards[i].attachedItems.length; j++)
+            itemIds.push(boards[i].attachedItems[j]._id);
+
+        Item.find( {_id: { $in: itemIds}}, function (err, items) {
+          if (err) {
+            return res.status(400).send({message:errorHandler.getErrorMessage(err)});
+          } else {
+            for (var i = 0; i < boards.length; i++) {
+              for (var j = 0; j < boards[i].attachedItems.length; j++){
+                for (var k = 0; k < items.length; k++) {
+                  if (items[k]._id.toString() === boards[i].attachedItems[j]._id.toString()) {
+                    boards[i].attachedItems[j] = items[k];
+                  }
+                }
+              }
+            }
+
+            res.json(boards);
+          }
+        });
+      }
+
     });
 };
 
@@ -350,7 +374,7 @@ exports.delete = function(req, res) {
  * List of Boards
  */
 exports.list = function(req, res) { 
-  Board.find().sort('-created').populate('user', 'firstName lastName username created').exec(function(err, boards) {
+  Board.find().sort('-created').lean().populate('user', 'firstName lastName username created').exec(function(err, boards) {
     if (err) {
       return res.status(400).send({
         message: errorHandler.getErrorMessage(err)

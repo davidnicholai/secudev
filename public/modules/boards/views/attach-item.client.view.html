@@ -1,0 +1,50 @@
+<section ng-controller="AttachItemController" ng-init="initialize(); getItems();">
+  <br>
+
+  <form ng-submit="create();" novalidate>
+    <fieldset>
+      <div class="form-group">
+        <div class="controls">
+          <textarea class="form-control" data-ng-model="message" id="message" placeholder="Allowed tags: <b> <i> <em> <strong> <a> <img>" rows=5></textarea>
+        </div>
+      </div>
+      <div class="form-group">
+        <input type="submit" class="btn btn-success" ng-disabled="cannotPost">
+      </div>
+      <div data-ng-show="error" class="text-danger">
+        <strong data-ng-bind="error"></strong>
+      </div>
+    </fieldset>
+  </form>
+
+  <div class="row">
+    <div class="col-md-12">
+      <li class="list-group-item">
+        <div class="row">
+          <div class="col-md-6">
+            <select id="itemlist" name="itemlist" class="btn form-control btn-default dropdown-toggle btn-block" ng-options="option._id as option.name for option in items" ng-model="selectedItem" required>
+            </select>
+          </div>
+
+          <div class="col-md-1 col-md-offset-5" style="margin-top: 5px;" ng-click="attachItem();">
+            <button class="btn btn-default btn-xs">Add Item</button>
+          </div>
+        </div>
+      </li>
+    </div>
+  </div>
+
+  <br>
+  <h5>Attached Items: </h5>
+
+  <div class="list-group col-md-2 text-center" ng-repeat="item in attachedItems">
+    <a class="list-group-item">
+      <img ng-src="/static/images/{{item.image}}" class="img-thumbnail user-profile-picture">
+      <hr>
+      <h4 class="list-group-item-heading">{{item.name}}</h4>
+      <p class="list-group-item-text">USD ${{item.price | number:2}}</p>
+    </a>
+  </div>
+
+
+</section>
