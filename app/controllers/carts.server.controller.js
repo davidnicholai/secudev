@@ -172,7 +172,7 @@ exports.getTransactionsDateRange = function (req, res) {
   var newDateTo = req.body.dateTo,
     newDateFrom = req.body.dateFrom;
 
-  Transaction.find( { created: {$gte: newDateTo, $lte: newDateFrom} } ).lean().exec(function (err, transactions) {
+  Transaction.find( { created: {$gte: newDateTo, $lte: newDateFrom} } ).sort('-created').lean().exec(function (err, transactions) {
     if (err || !transactions) return res.status(400).send({ message: 'An error occured while retrieving your transaction' });
 
     var userIds = [];
@@ -217,7 +217,7 @@ exports.getTransactionsDateRange = function (req, res) {
 };
 
 exports.getTransactions = function (req, res) {
-  Transaction.find().lean().exec(function (err, transactions) {
+  Transaction.find().sort('-created').lean().exec(function (err, transactions) {
     if (err || !transactions) return res.status(400).send({ message: 'An error occured while retrieving your transaction' });
 
     var userIds = [];
@@ -362,10 +362,10 @@ exports.checkout = function (req, res) {
         };
 
         paypalPayment.transactions[0].amount.total = totalPrice;
-        paypalPayment.redirect_urls.return_url = 'https://104.236.16.2/#!/shop/cart/confirm';
-        paypalPayment.redirect_urls.cancel_url = 'https://104.236.16.2/#!/shop/cart';
-        // paypalPayment.redirect_urls.return_url = 'http://localhost:3000/#!/shop/cart/confirm';
-        // paypalPayment.redirect_urls.cancel_url = 'http://localhost:3000/#!/shop/cart/cancel';
+        // paypalPayment.redirect_urls.return_url = 'https://104.236.16.2/#!/shop/cart/confirm';
+        // paypalPayment.redirect_urls.cancel_url = 'https://104.236.16.2/#!/shop/cart';
+        paypalPayment.redirect_urls.return_url = 'http://localhost:3000/#!/shop/cart/confirm';
+        paypalPayment.redirect_urls.cancel_url = 'http://localhost:3000/#!/shop/cart/cancel';
         paypalPayment.transactions[0].description = 'Total Price: $' + totalPrice;
         
         paypal.payment.create(paypalPayment, {}, function (err, response) {
@@ -375,6 +375,7 @@ exports.checkout = function (req, res) {
 
           if (response) {
             var link = response.links;
+            console.log('LINKS:' + JSON.stringify(link));
 
             var transaction = new Transaction();
             transaction.paymentId = response.id;

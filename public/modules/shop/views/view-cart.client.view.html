@@ -3,12 +3,12 @@
   <br><br>
 
   
-  <div class="col-md-12 alert alert-warning text-center" role="alert" ng-show="noItems">
+  <div class="col-md-12 alert alert-warning text-center" role="alert" ng-show="noItems === true">
     <p>You don't have any items in your cart. Don't worry, we'll wait for you while you shop.
   </div>
   
 
-  <div class="col-md-8" ng-show="!noItems">
+  <div class="col-md-8" ng-show="noItems !== null && noItems === false">
     <table class="table table-hover">
       <thead>
         <tr>
@@ -33,7 +33,7 @@
     </table>
   </div>
 
-  <div class="col-md-4 jumbotron container-cart-transaction" ng-show="!noItems">
+  <div class="col-md-4 jumbotron container-cart-transaction" ng-show="noItems !== null && noItems === false">
     <table class="table">
       <thead>
         <th>Item Name</th>

@@ -6,6 +6,7 @@ angular.module('shop').controller('CartController', ['$scope', '$stateParams', '
     $scope.chkOutBtn = 'Checkout';
     $scope.getCart = function () {
       $http.get('/carts').success(function (response) {
+        $scope.noItems = null;
         $scope.orderInfo = response;
 
         $scope.totalPrice = 0;
