@@ -19,7 +19,6 @@ angular.module('boards').controller('AttachItemController', ['$scope', '$statePa
         $http.get('/items/' + $stateParams.itemId).success(function (response) {
           $scope.attachedItems.push(response);
           $scope.removeItem(response);
-          console.log(response);
         }).error(function (response) {
           $scope.error = response;
         });
